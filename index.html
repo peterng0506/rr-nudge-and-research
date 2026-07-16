@@ -1,0 +1,2629 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Room Nudge & Research</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --police-blue: #00205B;
+            --police-light-blue: #0038A8;
+            --success-green: #2E7D32;
+            --warning-red: #C62828;
+            --neutral-gray-50: #F8FAFC;
+            --neutral-gray-100: #E9EEF2;
+            --neutral-gray-200: #CBD5E1;
+            --neutral-gray-300: #94A3B8;
+            --neutral-gray-400: #64748B;
+            --neutral-gray-800: #1E293B;
+            --orange-warning: #F59E0B;
+            --orange-bg: #FFFBEB;
+            --danger-bg: #FEE2E2;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 3px 8px rgba(0,0,0,0.09);
+            --shadow-lg: 0 6px 16px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --transition-fast: all 0.2s ease-in-out;
+            --netlify-purple: #00AD9F;
+            --google-blue: #4285F4;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+            background-color: var(--neutral-gray-50);
+            margin: 0;
+            padding: 16px;
+            color: var(--neutral-gray-800);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        h3 {
+            margin-top: 0;
+            color: var(--police-blue);
+            border-bottom: 2px solid var(--neutral-gray-200);
+            padding-bottom: 8px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        h4 {
+            margin: 16px 0 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--neutral-gray-800);
+        }
+        h5 {
+            margin: 12px 0 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--neutral-gray-800);
+        }
+        .required { color: var(--warning-red); }
+        .tip-text {
+            font-size: 12px;
+            color: var(--neutral-gray-300);
+            margin: 2px 0 8px;
+        }
+        .global-info-panel {
+            background: #fff;
+            padding: 18px 22px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        .global-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .form-item {
+            flex: 1;
+            min-width: 150px;
+        }
+        .form-item label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .form-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition-fast);
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .form-input-number {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition-fast);
+            -moz-appearance: textfield;
+        }
+        .form-input-number::-webkit-outer-spin-button,
+        .form-input-number::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .form-input-number:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 6px 0;
+        }
+        .select-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 8px 6px;
+            font-size: 13px;
+            border: 1px solid var(--neutral-gray-200);
+            background: #fff;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .select-btn:hover:not(.active) { background-color: var(--neutral-gray-100); }
+        .select-btn.active {
+            background-color: var(--police-light-blue);
+            color: white;
+            border-color: var(--police-light-blue);
+            font-weight: 600;
+        }
+        .single-obs-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .obs-card {
+            width: 100%;
+            max-width: 850px;
+            background: #fff;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--neutral-gray-200);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
+            position: relative;
+        }
+        .obs-card.running {
+            border-color: var(--success-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+        }
+        .obs-card.paused {
+            border-color: var(--orange-warning);
+        }
+        .col-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--neutral-gray-100);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .col-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .col-label {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--police-blue);
+        }
+        .case-id-input-small {
+            width: 150px;
+            padding: 6px 8px;
+            border: 1px solid var(--police-light-blue);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--police-blue);
+            text-align: center;
+            letter-spacing: 0.5px;
+            transition: var(--transition-fast);
+        }
+        .case-id-input-small:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .col-status {
+            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: var(--neutral-gray-200);
+            color: #333;
+            margin-left: 6px;
+            font-weight: 600;
+            transition: var(--transition-fast);
+        }
+        .obs-card.running .col-status {
+            background: var(--success-green);
+            color: #fff;
+        }
+        .obs-card.paused .col-status {
+            background: var(--orange-warning);
+            color: #fff;
+        }
+        .stopwatch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--neutral-gray-50);
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+            border: 1px solid var(--neutral-gray-200);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .col-stopwatch {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--neutral-gray-800);
+            font-variant-numeric: tabular-nums;
+        }
+        .col-control-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .ctrl-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition-fast);
+        }
+        .ctrl-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(50%);
+        }
+        .btn-start { background: var(--success-green); color: #fff; }
+        .btn-reset { background: #64748B; color: #fff; }
+        .btn-danger { background: var(--warning-red); color: #fff; }
+        .btn-danger:hover { background: #B71C1C; }
+        .col-timeline-section {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--neutral-gray-200);
+        }
+        .timeline-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: var(--neutral-gray-800);
+            font-weight: 500;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .timeline-wrap {
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 100px;
+            background: var(--neutral-gray-50);
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            position: relative;
+            padding: 16px 0;
+            scroll-behavior: smooth;
+        }
+        .timeline-track {
+            height: 4px;
+            background: var(--neutral-gray-300);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            min-width: 100%;
+        }
+        .timeline-now-line {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--warning-red);
+            z-index: 2;
+        }
+        .timeline-event {
+            position: absolute;
+            transform: translateX(-50%);
+            top: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 3;
+            background: var(--police-light-blue);
+            color: #fff;
+        }
+        .timeline-event.pending-event {
+            background: var(--orange-warning);
+            color: #fff;
+        }
+        .timeline-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            position: absolute;
+            top: calc(50% - 3.5px);
+            transform: translateX(-50%);
+            z-index: 3;
+            background: var(--police-light-blue);
+        }
+        .timeline-dot.pending-dot {
+            background: var(--orange-warning);
+        }
+        .timeline-note {
+            font-size: 12px;
+            color: var(--neutral-gray-400);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .pending-banner {
+            grid-column: 1 / -1;
+            background: var(--orange-bg);
+            border: 1px solid var(--orange-warning);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #B45309;
+            font-weight: 600;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .actions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .action-pair {
+            display: flex;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: #fff;
+            transition: var(--transition-fast);
+        }
+        .action-pair:hover {
+            border-color: var(--police-light-blue);
+        }
+        .action-btn-main {
+            flex: 1;
+            padding: 10px 12px;
+            font-size: 13px;
+            background: var(--neutral-gray-50);
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 500;
+            color: var(--neutral-gray-800);
+            transition: var(--transition-fast);
+        }
+        .action-btn-main:hover:not(:disabled) {
+            background: var(--neutral-gray-100);
+        }
+        .action-btn-note {
+            background: var(--neutral-gray-100);
+            border: none;
+            border-left: 1px solid var(--neutral-gray-200);
+            padding: 0 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neutral-gray-800);
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+        .action-btn-note:hover:not(:disabled) {
+            background: var(--police-light-blue);
+            color: white;
+        }
+        .action-btn-main:disabled, .action-btn-note:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--neutral-gray-100);
+        }
+        .quick-btn {
+            grid-column: 1 / -1;
+            padding: 12px;
+            background: var(--orange-bg);
+            border: 1px solid var(--orange-warning);
+            color: #B45309;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+        .quick-btn:hover:not(:disabled) { background: #FEF3C7; }
+        .quick-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .custom-action-row {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .custom-action-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            transition: var(--transition-fast);
+            min-width: 150px;
+        }
+        .custom-action-input:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .custom-action-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: var(--neutral-gray-50);
+        }
+        .detail-section {
+            padding-top: 16px;
+            border-top: 1px dashed var(--neutral-gray-200);
+            margin-bottom: 24px;
+        }
+        .trait-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .trait-group strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--neutral-gray-800);
+        }
+        .submit-section {
+            padding-top: 20px;
+            border-top: 2px solid var(--neutral-gray-200);
+            text-align: center;
+        }
+        .btn-submit {
+            background-color: var(--police-blue);
+            color: white;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-submit:hover {
+            background-color: var(--police-light-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .table-panel {
+            background: #fff;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow-x: auto;
+        }
+        .table-wrap {
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+        table {
+            min-width: 1100px;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid var(--neutral-gray-200);
+            padding: 6px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        th {
+            background-color: var(--neutral-gray-100);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        tbody tr:nth-child(even) { background-color: var(--neutral-gray-50); }
+        tbody tr:hover { background-color: rgba(0, 56, 168, 0.04); }
+        .time-cell { font-weight:700; color:var(--warning-red); }
+        .table-input {
+            width: 100%;
+            min-width: 60px;
+            padding: 4px 6px;
+            font-size: 13px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            transition: var(--transition-fast);
+        }
+        .table-input:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 2px rgba(0, 56, 168, 0.15);
+        }
+        .table-input.action-input {
+            border-color: var(--orange-warning);
+            background-color: var(--orange-bg);
+        }
+        .table-input.action-input:focus {
+            background-color: #fff;
+        }
+        .table-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .export-btn, .clear-btn, .excel-btn, .netlify-btn, .google-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-align: center;
+        }
+        .export-btn { background-color: var(--neutral-gray-800); color: white; }
+        .clear-btn { background-color: #64748B; color: white; }
+        .excel-btn { background-color: #1e6f3f; color: white; }
+        .netlify-btn { background-color: var(--netlify-purple); color: white; }
+        .google-btn { background-color: var(--google-blue); color: white; }
+        .export-btn:hover { background-color: #0F172A; }
+        .clear-btn:hover { background-color: #475569; }
+        .excel-btn:hover { background-color: #14532d; }
+        .netlify-btn:hover { background-color: #008A7E; }
+        .google-btn:hover { background-color: #3367D6; }
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-box {
+            background: #fff;
+            padding: 24px;
+            border-radius: var(--radius-md);
+            min-width: 400px;
+            max-width: 95%;
+            box-shadow: var(--shadow-lg);
+            transform: scale(1);
+            animation: scaleUp 0.2s ease-out;
+        }
+        @keyframes scaleUp {
+            from { transform: scale(0.95); }
+            to { transform: scale(1); }
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 12px;
+        }
+        .modal-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            margin: 10px 0 16px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: var(--transition-fast);
+        }
+        .modal-textarea:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 90px;
+            transition: var(--transition-fast);
+        }
+        .modal-save { background: var(--police-light-blue); color: white; }
+        .modal-save:hover { background: var(--police-blue); }
+        .modal-skip { background: var(--neutral-gray-200); color: #1E293B; }
+        .modal-skip:hover { background: var(--neutral-gray-300); }
+        .modal-cancel { background: var(--danger-bg); color: var(--warning-red); border: 1px solid var(--warning-red); margin-right: auto; }
+        .modal-cancel:hover { background: var(--warning-red); color: white; }
+        .privacy-banner {
+            background-color: var(--orange-bg);
+            color: #B45309;
+            padding: 10px 16px;
+            border-left: 6px solid var(--orange-warning);
+            margin-bottom: 16px;
+            font-size: 13px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+        }
+
+        .page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            display: none;
+        }
+        .page-container.active {
+            display: block;
+        }
+
+        /* ===== 首頁 ===== */
+        .home-wrapper {
+            background: #fff;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-top: 40px;
+        }
+        .home-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .home-subtitle {
+            font-size: 16px;
+            color: var(--neutral-gray-400);
+            margin-bottom: 40px;
+        }
+        .home-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .home-btn {
+            min-width: 180px;
+            padding: 14px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            color: #fff;
+            background-color: var(--police-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .home-btn.observer {
+            background-color: var(--success-green);
+        }
+        .home-btn.observer:hover {
+            background-color: #1B5E20;
+        }
+        .home-btn.admin {
+            background-color: var(--neutral-gray-400);
+        }
+        .home-btn.admin:hover {
+            background-color: #475569;
+        }
+
+        /* ===== 選擇觀察員頁面 ===== */
+        .select-observer-wrapper {
+            background: #fff;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-top: 40px;
+        }
+        .select-observer-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 8px;
+        }
+        .select-observer-subtitle {
+            font-size: 14px;
+            color: var(--neutral-gray-400);
+            margin-bottom: 30px;
+        }
+        .observer-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .observer-option-btn {
+            min-width: 120px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            color: var(--neutral-gray-800);
+        }
+        .observer-option-btn:hover:not(.selected) {
+            border-color: var(--police-light-blue);
+            background: var(--neutral-gray-50);
+        }
+        .observer-option-btn.selected {
+            border-color: var(--police-light-blue);
+            background: var(--police-light-blue);
+            color: white;
+        }
+        .observer-option-btn.other-btn {
+            border-color: var(--neutral-gray-300);
+            color: var(--neutral-gray-600);
+        }
+        .observer-option-btn.other-btn:hover {
+            border-color: var(--orange-warning);
+            background: var(--orange-bg);
+            color: var(--orange-warning);
+        }
+        .selected-display {
+            font-size: 16px;
+            color: var(--neutral-gray-600);
+            margin-bottom: 24px;
+            min-height: 28px;
+        }
+        .selected-display strong {
+            color: var(--police-blue);
+        }
+        .select-observer-back {
+            background-color: #64748B;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .select-observer-back:hover {
+            background-color: #475569;
+        }
+
+        /* ===== Admin 頁面 ===== */
+        .admin-wrapper {
+            background: #fff;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            padding: 30px 30px;
+            box-shadow: var(--shadow-lg);
+            margin-top: 20px;
+        }
+        .admin-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 4px;
+        }
+        .admin-subtitle {
+            font-size: 14px;
+            color: var(--neutral-gray-400);
+            margin-bottom: 20px;
+        }
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .admin-stat-card {
+            background: var(--neutral-gray-50);
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            text-align: center;
+        }
+        .admin-stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--police-blue);
+        }
+        .admin-stat-label {
+            font-size: 13px;
+            color: var(--neutral-gray-400);
+            margin-top: 4px;
+        }
+        .admin-observer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .admin-observer-card {
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            background: #fff;
+            transition: var(--transition-fast);
+        }
+        .admin-observer-card:hover {
+            border-color: var(--police-light-blue);
+        }
+        .admin-observer-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 8px;
+        }
+        .admin-observer-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            font-size: 13px;
+        }
+        .admin-observer-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .admin-observer-stats .stat-value {
+            font-weight: 700;
+            color: var(--neutral-gray-800);
+        }
+        .admin-observer-stats .stat-label {
+            color: var(--neutral-gray-400);
+        }
+        .admin-observer-progress {
+            margin-top: 10px;
+            background: var(--neutral-gray-200);
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+        }
+        .admin-observer-progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--success-green);
+            transition: width 0.5s ease;
+        }
+        .admin-observer-progress-bar.partial {
+            background: var(--orange-warning);
+        }
+        .admin-observer-progress-bar.low {
+            background: var(--warning-red);
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-tag.active {
+            background: #DCFCE7;
+            color: #166534;
+        }
+        .status-tag.ended {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+        .status-tag.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        .status-tag.submitted {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+
+        .admin-upload-area {
+            border: 2px dashed var(--neutral-gray-300);
+            border-radius: var(--radius-sm);
+            padding: 30px 20px;
+            text-align: center;
+            margin: 16px 0 24px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            background: var(--neutral-gray-50);
+        }
+        .admin-upload-area:hover {
+            border-color: var(--police-light-blue);
+            background: #fff;
+        }
+        .admin-upload-area.dragover {
+            border-color: var(--success-green);
+            background: var(--success-bg);
+        }
+        .admin-upload-area .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        .admin-upload-area .text {
+            font-size: 14px;
+            color: var(--neutral-gray-400);
+        }
+        .admin-upload-area .text strong {
+            color: var(--police-blue);
+        }
+        .admin-upload-area .sub-text {
+            font-size: 12px;
+            color: var(--neutral-gray-300);
+            margin-top: 4px;
+        }
+
+        .admin-table-wrap {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        .admin-table-wrap table {
+            min-width: 600px;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .admin-table-wrap th, .admin-table-wrap td {
+            border: 1px solid var(--neutral-gray-200);
+            padding: 8px 12px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .admin-table-wrap th {
+            background-color: var(--neutral-gray-100);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .admin-table-wrap tbody tr:nth-child(even) {
+            background-color: var(--neutral-gray-50);
+        }
+        .admin-table-wrap tbody tr:hover {
+            background-color: rgba(0, 56, 168, 0.04);
+        }
+
+        .admin-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .back-btn {
+            background-color: #64748B;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .back-btn:hover {
+            background-color: #475569;
+        }
+
+        .last-updated {
+            font-size: 12px;
+            color: var(--neutral-gray-400);
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .home-wrapper, .select-observer-wrapper, .admin-wrapper {
+                padding: 30px 20px;
+            }
+            .home-title {
+                font-size: 24px;
+            }
+            .home-btn {
+                min-width: 140px;
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+            .home-buttons {
+                gap: 12px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .observer-option-btn {
+                min-width: 100px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            .admin-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .admin-observer-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-title {
+                font-size: 20px;
+            }
+        }
+        @media (max-width: 768px) {
+            .home-wrapper, .select-observer-wrapper, .admin-wrapper {
+                padding: 40px 24px;
+            }
+            .home-title {
+                font-size: 28px;
+            }
+            .admin-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- 首頁 -->
+    <!-- ============================================================ -->
+    <div id="page-home" class="page-container active">
+        <div class="privacy-banner">
+            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+        </div>
+        <div class="home-wrapper">
+            <div class="home-title">Report Room Nudge &amp; Research</div>
+            <div class="home-subtitle">報案室行為觀察系統</div>
+            <div class="home-buttons">
+                <button class="home-btn admin" onclick="goToAdmin()">Administrator</button>
+                <button class="home-btn observer" onclick="goToSelectObserver()">Observar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 選擇觀察員頁面 -->
+    <!-- ============================================================ -->
+    <div id="page-select-observer" class="page-container">
+        <div class="privacy-banner">
+            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+        </div>
+        <div class="select-observer-wrapper">
+            <div class="select-observer-title">選擇觀察員</div>
+            <div class="select-observer-subtitle">請選擇您的身份，系統將自動帶入觀察者姓名</div>
+
+            <div class="observer-options">
+                <button class="observer-option-btn" onclick="selectObserver('Churchill')">Churchill</button>
+                <button class="observer-option-btn" onclick="selectObserver('Siu Wai')">Siu Wai</button>
+                <button class="observer-option-btn" onclick="selectObserver('Lily')">Lily</button>
+                <button class="observer-option-btn" onclick="selectObserver('Peter')">Peter</button>
+                <button class="observer-option-btn other-btn" onclick="selectObserver('Other')">Other</button>
+            </div>
+
+            <div class="selected-display" id="selectedDisplay"></div>
+
+            <button class="select-observer-back" onclick="goHome()">返回首頁</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Admin 頁面 -->
+    <!-- ============================================================ -->
+    <div id="page-admin" class="page-container">
+        <div class="privacy-banner">
+            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+        </div>
+
+        <div style="margin-bottom: 16px; text-align: right;">
+            <button class="back-btn" onclick="goHome()">返回首頁</button>
+            <button class="ctrl-btn btn-reset" onclick="loadAdminData()" style="background: var(--police-blue); color: #fff; margin-left: 8px;">🔄 重新整理</button>
+        </div>
+
+        <div class="admin-wrapper">
+            <div class="admin-title">管理員儀表板</div>
+            <div class="admin-subtitle">觀察員填寫進度總覽（自動從雲端同步）</div>
+
+            <!-- 統計總覽 -->
+            <div class="admin-stats-grid" id="adminStatsGrid">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-number" id="totalCases">0</div>
+                    <div class="admin-stat-label">總案件數</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-number" id="totalObservers">0</div>
+                    <div class="admin-stat-label">觀察員人數</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-number" id="totalSubmitted">0</div>
+                    <div class="admin-stat-label">已提交案件</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-number" id="totalActive">0</div>
+                    <div class="admin-stat-label">進行中案件</div>
+                </div>
+            </div>
+
+            <!-- 觀察員進度卡片 -->
+            <h4 style="margin-bottom:12px;">觀察員進度</h4>
+            <div class="admin-observer-grid" id="adminObserverGrid">
+                <div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">載入中...</div>
+            </div>
+
+            <!-- 詳細數據表格 -->
+            <h4 style="margin-bottom:12px;">所有案件明細</h4>
+            <div class="admin-table-wrap">
+                <table id="adminDetailTable">
+                    <thead>
+                        <tr>
+                            <th>觀察員</th>
+                            <th>報案人編號</th>
+                            <th>日期</th>
+                            <th>時段</th>
+                            <th>報案室</th>
+                            <th>狀態</th>
+                            <th>動作數</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminDetailBody">
+                        <tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">載入中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="last-updated" id="adminLastUpdated">最後更新：--</div>
+
+            <!-- 操作按鈕 -->
+            <div class="admin-actions">
+                <button class="admin-btn" onclick="exportAdminCSV()">匯出全部數據 (CSV)</button>
+                <button class="excel-btn" onclick="exportAdminExcel()">匯出 Excel 報告</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 觀察頁 -->
+    <!-- ============================================================ -->
+    <div id="page-observer" class="page-container">
+        <form name="observation-data" netlify netlify-honeypot="bot-field" hidden>
+            <input type="hidden" name="form-name" value="observation-data">
+            <input type="text" name="observer" />
+            <input type="text" name="date" />
+            <input type="text" name="period" />
+            <input type="text" name="division" />
+            <input type="text" name="observer_count" />
+            <input type="text" name="staff_count" />
+            <input type="text" name="counter_count" />
+            <textarea name="records_data"></textarea>
+        </form>
+
+        <div class="privacy-banner">
+            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+        </div>
+
+        <div style="margin-bottom: 16px; text-align: right;">
+            <button class="ctrl-btn btn-reset" onclick="goHome()" style="background: #64748B; color: #fff;">返回首頁</button>
+        </div>
+
+        <div class="global-info-panel">
+            <h3>觀察基礎資訊 <span class="tip-text">（帶*為必填）</span></h3>
+            <div class="global-row">
+                <div class="form-item">
+                    <label>觀察者姓名 <span class="required">*</span></label>
+                    <input class="form-input" id="observerName" placeholder="請選擇觀察員" onchange="saveLocalStorage()">
+                </div>
+                <div class="form-item">
+                    <label>觀察日期 <span class="required">*</span></label>
+                    <input class="form-input" id="obsDate" type="date" onchange="saveLocalStorage()">
+                </div>
+                <div class="form-item">
+                    <label>觀察時段 <span class="required">*</span></label>
+                    <div class="btn-group" id="periodGroup">
+                        <button class="select-btn" onclick="selectPeriod('AM', this)">AM</button>
+                        <button class="select-btn" onclick="selectPeriod('PM', this)">PM</button>
+                        <button class="select-btn" onclick="selectPeriod('Evening', this)">Evening</button>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label>報案室 <span class="required">*</span></label>
+                    <div class="btn-group" id="divisionGroup">
+                        <button class="select-btn" onclick="selectDivision('TSTDIV RR', this)">TSTDIV</button>
+                        <button class="select-btn" onclick="selectDivision('MKDIST RR', this)">MKDIST</button>
+                        <button class="select-btn" onclick="selectDivision('YLDIV RR', this)">YLDIV</button>
+                        <button class="select-btn" onclick="selectDivision('TPDIV RR', this)">TPDIV</button>
+                    </div>
+                </div>
+            </div>
+            <div class="global-row" style="margin-top: 12px;">
+                <div class="form-item">
+                    <label>觀察員數目</label>
+                    <input class="form-input-number" id="observerCount" type="number" min="0" placeholder="0" onchange="saveLocalStorage()">
+                </div>
+                <div class="form-item">
+                    <label>職員數目</label>
+                    <input class="form-input-number" id="staffCount" type="number" min="0" placeholder="0" onchange="saveLocalStorage()">
+                </div>
+                <div class="form-item">
+                    <label>開放櫃枱數目</label>
+                    <input class="form-input-number" id="counterCount" type="number" min="0" placeholder="0" onchange="saveLocalStorage()">
+                </div>
+            </div>
+        </div>
+
+        <h3>當前報案人記錄</h3>
+        <div class="single-obs-wrap" id="obsContainer"></div>
+
+        <div class="table-panel">
+            <h3>全部觀察數據匯總表</h3>
+            <div class="table-wrap">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>報案人編號</th>
+                            <th>觀察者</th>
+                            <th>觀察日期</th>
+                            <th>觀察時段</th>
+                            <th>報案室</th>
+                            <th>觀察員數目</th>
+                            <th>職員數目</th>
+                            <th>開放櫃枱數目</th>
+                            <th>開始時間</th>
+                            <th>結束時間</th>
+                            <th>性別</th>
+                            <th>年齡層</th>
+                            <th>族裔</th>
+                            <th>行為動作</th>
+                            <th>動作備註</th>
+                            <th>階段歷時(秒)</th>
+                            <th>總時長(秒)</th>
+                            <th>記錄時間</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-body"></tbody>
+                </table>
+            </div>
+            <div class="table-btn-group">
+                <button class="export-btn" onclick="exportCSV()">匯出全部CSV數據</button>
+                <button class="excel-btn" onclick="exportExcel()">匯出為 Excel 報告</button>
+                <button class="netlify-btn" onclick="submitToNetlify()">提交至後台 (Netlify)</button>
+                <button class="clear-btn" onclick="clearAllRecords()">清空全部記錄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- JavaScript -->
+    <!-- ============================================================ -->
+    <script>
+        // ================================================================
+        // Netlify Blob Storage 設定
+        // 請將 YOUR_NETLIFY_SITE_ID 換成您的 Site ID
+        // ================================================================
+        const NETLIFY_SITE_ID = 'YOUR_NETLIFY_SITE_ID';  // ← 請修改這裡！
+
+        // 儲存觀察者數據的 key
+        const STORAGE_KEY = 'observation_data';
+
+        // ===== Netlify Blob 操作函數 =====
+
+        // 讀取所有觀察數據
+        async function fetchAllData() {
+            try {
+                const url = `/.netlify/functions/blob?siteId=${NETLIFY_SITE_ID}&key=${STORAGE_KEY}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        return {}; // 尚無數據
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('讀取數據失敗:', error);
+                return {};
+            }
+        }
+
+        // 寫入數據
+        async function saveData(data) {
+            try {
+                const response = await fetch('/.netlify/functions/blob', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        siteId: NETLIFY_SITE_ID,
+                        key: STORAGE_KEY,
+                        data: data
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return true;
+            } catch (error) {
+                console.error('儲存數據失敗:', error);
+                return false;
+            }
+        }
+
+        // ===== 觀察者數據同步（自動） =====
+
+        // 將當前記錄同步到雲端
+        async function syncToCloud() {
+            if (allRecords.length === 0) return;
+
+            const observer = document.getElementById('observerName').value || '未填寫';
+            
+            // 讀取現有雲端數據
+            const cloudData = await fetchAllData();
+            
+            // 更新該觀察者的記錄
+            cloudData[observer] = {
+                records: allRecords.slice(),
+                lastUpdated: new Date().toISOString()
+            };
+
+            // 寫回雲端
+            await saveData(cloudData);
+            console.log(`✅ 已同步 ${allRecords.length} 筆記錄到雲端`);
+        }
+
+        // ===== Admin 頁面載入數據 =====
+
+        async function loadAdminData() {
+            const grid = document.getElementById('adminObserverGrid');
+            const tbody = document.getElementById('adminDetailBody');
+            const lastUpdated = document.getElementById('adminLastUpdated');
+
+            // 顯示載入中
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">載入中...</div>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">載入中...</td></tr>';
+
+            try {
+                const cloudData = await fetchAllData();
+                const observers = Object.keys(cloudData);
+                
+                if (observers.length === 0) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無數據，請等待觀察員開始記錄</div>';
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
+                    lastUpdated.textContent = '最後更新：' + new Date().toLocaleTimeString('zh-HK');
+                    updateStats({});
+                    return;
+                }
+
+                // 收集所有案件
+                let allCases = [];
+                let observerCaseCount = {};
+
+                observers.forEach(obs => {
+                    const records = cloudData[obs].records || [];
+                    observerCaseCount[obs] = records.length;
+                    records.forEach(record => {
+                        allCases.push({
+                            ...record,
+                            observerName: obs
+                        });
+                    });
+                });
+
+                // 更新統計
+                updateStats({ allCases, observerCaseCount, observers });
+
+                // 渲染觀察員卡片
+                renderObserverCards(observerCaseCount);
+
+                // 渲染詳細表格
+                renderAdminTable(allCases);
+
+                lastUpdated.textContent = '最後更新：' + new Date().toLocaleTimeString('zh-HK');
+
+            } catch (error) {
+                console.error('載入數據失敗:', error);
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--warning-red);padding:20px;">載入失敗，請點擊「重新整理」重試</div>';
+            }
+        }
+
+        function updateStats(data) {
+            const allCases = data.allCases || [];
+            const observers = data.observers || [];
+            const totalCases = allCases.length;
+            const totalObservers = observers.length;
+            const totalSubmitted = allCases.filter(c => c.endTime).length;
+            const totalActive = allCases.filter(c => !c.endTime).length;
+
+            document.getElementById('totalCases').textContent = totalCases;
+            document.getElementById('totalObservers').textContent = totalObservers;
+            document.getElementById('totalSubmitted').textContent = totalSubmitted;
+            document.getElementById('totalActive').textContent = totalActive;
+        }
+
+        function renderObserverCards(observerCaseCount) {
+            const grid = document.getElementById('adminObserverGrid');
+            grid.innerHTML = '';
+
+            const observerNames = Object.keys(observerCaseCount);
+            if (observerNames.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無觀察員數據</div>';
+                return;
+            }
+
+            observerNames.forEach(name => {
+                const caseCount = observerCaseCount[name];
+                const completionRate = caseCount > 0 ? Math.min(100, caseCount * 10) : 0; // 假設目標為 10 個案件
+
+                let progressClass = 'admin-observer-progress-bar';
+                if (completionRate < 30) progressClass += ' low';
+                else if (completionRate < 70) progressClass += ' partial';
+
+                const card = document.createElement('div');
+                card.className = 'admin-observer-card';
+                card.innerHTML = `
+                    <div class="admin-observer-name">${name}</div>
+                    <div class="admin-observer-stats">
+                        <span><span class="stat-value">${caseCount}</span> <span class="stat-label">總案件</span></span>
+                        <span><span class="stat-value">${Math.round(completionRate)}%</span> <span class="stat-label">完成率</span></span>
+                    </div>
+                    <div class="admin-observer-progress">
+                        <div class="${progressClass}" style="width:${completionRate}%;"></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderAdminTable(allCases) {
+            const tbody = document.getElementById('adminDetailBody');
+            tbody.innerHTML = '';
+
+            if (allCases.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
+                return;
+            }
+
+            // 顯示最近 100 筆（按時間倒序）
+            const sorted = allCases.slice().sort((a, b) => {
+                return (b.recordTime || '').localeCompare(a.recordTime || '');
+            }).slice(0, 100);
+
+            sorted.forEach(c => {
+                const tr = document.createElement('tr');
+                const status = c.endTime ? '已結束' : '進行中';
+                const statusColor = c.endTime ? 'ended' : 'active';
+                tr.innerHTML = `
+                    <td>${c.observerName || '-'}</td>
+                    <td>${c.obsIndex || '-'}</td>
+                    <td>${c.date || '-'}</td>
+                    <td>${c.period || '-'}</td>
+                    <td>${c.division || '-'}</td>
+                    <td><span class="status-tag ${statusColor}">${status}</span></td>
+                    <td>${c.action ? 1 : 0}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (allCases.length > 100) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="7" style="text-align:center;color:var(--neutral-gray-400);">顯示最近 100 筆，共 ${allCases.length} 筆</td>`;
+                tbody.appendChild(tr);
+            }
+        }
+
+        // ===== 修改現有函數：自動同步 =====
+
+        // 修改 executeAddEvent - 記錄動作後自動同步
+        const originalExecuteAddEvent = executeAddEvent;
+        executeAddEvent = function(actionName, note = "", isPending = false) {
+            originalExecuteAddEvent(actionName, note, isPending);
+            // 自動同步到雲端（非同步，不阻塞）
+            syncToCloud().catch(e => console.error('同步失敗:', e));
+        };
+
+        // 修改 submitCurrentObservation - 結束觀察時同步
+        const originalSubmitCurrent = submitCurrentObservation;
+        submitCurrentObservation = function() {
+            originalSubmitCurrent();
+            // 結束時強制同步
+            syncToCloud().catch(e => console.error('同步失敗:', e));
+        };
+
+        // 修改 recordLeaveAction - 離開時同步
+        const originalRecordLeave = recordLeaveAction;
+        recordLeaveAction = function(withNote) {
+            originalRecordLeave(withNote);
+            // 離開時強制同步
+            setTimeout(() => {
+                syncToCloud().catch(e => console.error('同步失敗:', e));
+            }, 100);
+        };
+
+        // ================================================================
+        // 頁面切換函數
+        // ================================================================
+        function showPage(pageId) {
+            document.querySelectorAll('.page-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            // 如果進入 Admin 頁面，自動載入數據
+            if (pageId === 'page-admin') {
+                loadAdminData();
+            }
+        }
+
+        function goHome() {
+            showPage('page-home');
+        }
+
+        function goToAdmin() {
+            showPage('page-admin');
+        }
+
+        function goToSelectObserver() {
+            showPage('page-select-observer');
+            document.querySelectorAll('.observer-option-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('selectedDisplay').textContent = '';
+        }
+
+        function goToObserver() {
+            showPage('page-observer');
+            if (!currentObs) {
+                currentObs = createBlankObsItem();
+                renderObservationCard();
+                refreshTable();
+            }
+            if (!window._timerStarted) {
+                setInterval(updateTimer, 1000);
+                window._timerStarted = true;
+            }
+        }
+
+        // ===== 選擇觀察員 =====
+        function selectObserver(name) {
+            document.querySelectorAll('.observer-option-btn').forEach(btn => btn.classList.remove('selected'));
+
+            if (name === 'Other') {
+                document.getElementById('selectedDisplay').textContent = '您選擇了 Other，請在觀察頁自行填寫姓名。';
+                document.getElementById('observerName').value = '';
+                setTimeout(goToObserver, 300);
+                return;
+            }
+
+            const buttons = document.querySelectorAll('.observer-option-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.trim() === name) {
+                    btn.classList.add('selected');
+                }
+            });
+
+            document.getElementById('selectedDisplay').innerHTML = '已選擇：<strong>' + name + '</strong>';
+            document.getElementById('observerName').value = name;
+            localStorage.setItem('selectedObserver', name);
+            setTimeout(goToObserver, 400);
+        }
+
+        // ================================================================
+        // Admin 匯出功能
+        // ================================================================
+
+        let adminExportData = [];
+
+        async function exportAdminCSV() {
+            const cloudData = await fetchAllData();
+            const allCases = [];
+            Object.keys(cloudData).forEach(obs => {
+                (cloudData[obs].records || []).forEach(record => {
+                    allCases.push({
+                        ...record,
+                        observerName: obs
+                    });
+                });
+            });
+
+            if (allCases.length === 0) {
+                alert('沒有數據可匯出！');
+                return;
+            }
+
+            const headers = ['觀察員', '報案人編號', '日期', '時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
+            let csvContent = "\uFEFF" + headers.join(",") + "\n";
+
+            allCases.forEach(rec => {
+                const row = [
+                    rec.observerName || '',
+                    rec.obsIndex || '',
+                    rec.date || '',
+                    rec.period || '',
+                    rec.division || '',
+                    rec.gender || '',
+                    rec.age || '',
+                    rec.ethnicity || '',
+                    rec.action || '',
+                    rec.note || '',
+                    rec.stageDuration !== undefined ? rec.stageDuration : '',
+                    rec.totalDuration !== undefined ? rec.totalDuration : '',
+                    rec.recordTime || ''
+                ].map(v => `"${String(v).replace(/"/g, '""')}"`);
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `admin_匯出數據_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function exportAdminExcel() {
+            const cloudData = await fetchAllData();
+            const allCases = [];
+            Object.keys(cloudData).forEach(obs => {
+                (cloudData[obs].records || []).forEach(record => {
+                    allCases.push({
+                        ...record,
+                        observerName: obs
+                    });
+                });
+            });
+
+            if (allCases.length === 0) {
+                alert('沒有數據可匯出！');
+                return;
+            }
+
+            const data = [['觀察員', '報案人編號', '日期', '時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間']];
+            allCases.forEach(rec => {
+                data.push([
+                    rec.observerName || '',
+                    rec.obsIndex || '',
+                    rec.date || '',
+                    rec.period || '',
+                    rec.division || '',
+                    rec.gender || '',
+                    rec.age || '',
+                    rec.ethnicity || '',
+                    rec.action || '',
+                    rec.note || '',
+                    rec.stageDuration !== undefined ? rec.stageDuration : '',
+                    rec.totalDuration !== undefined ? rec.totalDuration : '',
+                    rec.recordTime || ''
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            ws['!cols'] = [
+                { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 12 },
+                { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 25 }, { wch: 20 },
+                { wch: 18 }, { wch: 18 }, { wch: 18 }
+            ];
+            XLSX.utils.book_append_sheet(wb, ws, '數據');
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `admin_匯出報告_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        // ================================================================
+        // 行為動作清單
+        // ================================================================
+        const predefinedActions = [
+            '留意到取票機',
+            '留意到自助服務機',
+            '留意到網上服務',
+            '取票機',
+            '櫃枱',
+            '自助服務機',
+            '等候區',
+            '職員諮詢/指示',
+            '櫃枱接待報案',
+            '完成自助服務機報案',
+            '完成網上服務報案'
+        ];
+
+        let globalDivision = "";
+        let globalPeriod = "";
+        let allRecords = [];   
+        let currentObs = null; 
+
+        // ===== 自動偵測報案室 =====
+        function autoDetectDivision() {
+            if (!navigator.geolocation) return;
+            const divisions = [
+                { name: 'TSTDIV RR', label: 'TSTDIV', lat: 22.2948, lng: 114.1710 },
+                { name: 'MKDIST RR', label: 'MKDIST', lat: 22.3167, lng: 114.1694 },
+                { name: 'YLDIV RR', label: 'YLDIV', lat: 22.4428, lng: 114.0230 },
+                { name: 'TPDIV RR', label: 'TPDIV', lat: 22.4506, lng: 114.1640 }
+            ];
+            function getDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                          Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                return R * c;
+            }
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    let nearest = null;
+                    let minDistance = Infinity;
+                    divisions.forEach(div => {
+                        const dist = getDistance(userLat, userLng, div.lat, div.lng);
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            nearest = div;
+                        }
+                    });
+                    if (nearest) {
+                        const buttons = document.querySelectorAll('#divisionGroup .select-btn');
+                        buttons.forEach(btn => {
+                            if (btn.textContent.trim() === nearest.label) {
+                                btn.click();
+                            }
+                        });
+                    }
+                },
+                function(error) {},
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            );
+        }
+
+        // ===== 自動選擇時段 =====
+        function autoSelectPeriod() {
+            const now = new Date();
+            const hours = now.getHours();
+            let periodName = '';
+            if (hours >= 0 && hours < 12) periodName = 'AM';
+            else if (hours >= 12 && hours < 18) periodName = 'PM';
+            else periodName = 'Evening';
+            const buttons = document.querySelectorAll('#periodGroup .select-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.trim() === periodName) btn.click();
+            });
+        }
+
+        function generateUniqueCaseId() {
+            let prefix = 'TST';
+            if (globalDivision.includes('TST')) prefix = 'TST';
+            else if (globalDivision.includes('MK')) prefix = 'MK';
+            else if (globalDivision.includes('YL')) prefix = 'YL';
+            else if (globalDivision.includes('TP')) prefix = 'TP';
+            let result = '';
+            let isUnique = false;
+            let checkLimit = 0;
+            while (!isUnique && checkLimit < 1000) {
+                const num = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+                result = prefix + num;
+                isUnique = !allRecords.some(r => r.obsIndex === result);
+                checkLimit++;
+            }
+            return result;
+        }
+
+        function createBlankObsItem() {
+            return {
+                id: 'obs_' + Date.now(),
+                caseIndex: generateUniqueCaseId(), 
+                isRunning: false,
+                elapsedSeconds: 0,
+                startTime: "",
+                endTime: "",
+                timelineEvents: [],
+                gender: '未選擇',
+                age: '未選擇',
+                ethnicity: '未選擇'
+            };
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('obsDate');
+            if(!dateInput.value) {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                dateInput.value = year + '-' + month + '-' + day;
+            }
+            loadLocalStorage();
+
+            const savedObserver = localStorage.getItem('selectedObserver');
+            if (savedObserver && savedObserver !== 'Other') {
+                document.getElementById('observerName').value = savedObserver;
+            }
+
+            if (!currentObs) {
+                currentObs = createBlankObsItem();
+            }
+            renderObservationCard();
+            refreshTable();
+            setInterval(updateTimer, 1000);
+            updateRealTimeClock();
+
+            setTimeout(autoSelectPeriod, 300);
+            setTimeout(autoDetectDivision, 800);
+
+            showPage('page-home');
+        });
+
+        function selectDivision(name, el) {
+            globalDivision = name;
+            [...el.parentElement.children].forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            saveLocalStorage();
+            syncCurrentObsToAllRecords();
+            refreshTable();
+        }
+
+        function selectPeriod(periodName, el) {
+            globalPeriod = periodName;
+            [...el.parentElement.children].forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            saveLocalStorage();
+            syncCurrentObsToAllRecords();
+            refreshTable();
+        }
+
+        function getCountValues() {
+            const obsCount = parseInt(document.getElementById('observerCount').value) || 0;
+            const staffCount = parseInt(document.getElementById('staffCount').value) || 0;
+            const counterCount = parseInt(document.getElementById('counterCount').value) || 0;
+            return { observerCount: obsCount, staffCount: staffCount, counterCount: counterCount };
+        }
+
+        function renderObservationCard() {
+            const container = document.getElementById('obsContainer');
+            if (!container || !currentObs) return;
+            const obs = currentObs;
+            const statusText = obs.isRunning ? '計時中' : (obs.elapsedSeconds > 0 ? '已暫停' : '未開始');
+            const mins = Math.floor(obs.elapsedSeconds / 60).toString().padStart(2, '0');
+            const secs = (obs.elapsedSeconds % 60).toString().padStart(2, '0');
+            const cardClass = `obs-card ${obs.isRunning ? 'running' : (obs.elapsedSeconds > 0 ? 'paused' : '')}`;
+
+            const hasPending = obs.timelineEvents.some(e => e.isPending);
+            let pendingBannerHtml = "";
+            if (hasPending) {
+                pendingBannerHtml = `
+                    <div class="pending-banner">
+                        <span>目前有候補時間點尚未命名（提示：您可直接在下方「數據匯總表」內打字修改）</span>
+                        <button class="ctrl-btn btn-start" style="padding: 4px 12px; font-size: 12px; background: var(--orange-warning);" onclick="fillPendingName()">彈窗補齊</button>
+                    </div>
+                `;
+            }
+
+            let actionsHtml = predefinedActions.map(act => `
+                <div class="action-pair">
+                    <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
+                    <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="${cardClass}" data-id="${obs.id}">
+                    <div class="col-header">
+                        <div class="col-title-wrap">
+                            <span class="col-label">報案人編號：</span>
+                            <input class="case-id-input-small" value="${obs.caseIndex}" 
+                                   onchange="changeCaseId(this)" placeholder="編號">
+                            <span class="col-status">${statusText}</span>
+                        </div>
+                    </div>
+
+                    <div class="stopwatch-container">
+                        <div class="col-stopwatch">${mins}:${secs}</div>
+                        <div class="col-control-btns">
+                            <button class="ctrl-btn btn-start" ${obs.isRunning ? 'disabled' : ''} onclick="startTimer()">進入報案室 (開始觀察)</button>
+                            <button class="ctrl-btn btn-reset" onclick="resetTimer()">取消記錄</button>
+                        </div>
+                    </div>
+
+                    <div class="col-timeline-section">
+                        <div class="timeline-info-row">
+                            <span>當前已持續時間：<strong>${mins}:${secs}</strong></span>
+                            <span id="realTimeClock">當前時間：--:--:--</span>
+                            <span>已記錄事件數：<strong id="timeline-count">${obs.timelineEvents.length}</strong></span>
+                        </div>
+                        <div class="timeline-wrap" data-timeline-wrap>
+                            <div class="timeline-track" data-timeline-track></div>
+                            <div class="timeline-now-line" data-timeline-now></div>
+                        </div>
+                        <div class="timeline-note">首個動作為自動起點，其後標示兩動作之間歷時，紅線為當前時間點。</div>
+                    </div>
+
+                    <h4>行為動作記錄</h4>
+                    <div class="actions-container">
+                        <button class="quick-btn" ${!obs.isRunning ? 'disabled' : ''} onclick="quickMark()">
+                            快速記錄當下時間 (後補動作)
+                        </button>
+                        ${pendingBannerHtml}
+                        ${actionsHtml}
+                        <div class="custom-action-row">
+                            <input class="custom-action-input" placeholder="輸入其他自訂動作，按 Enter 記錄" 
+                                   onkeydown="if(event.key==='Enter')recordCustomAction(this, false)"
+                                   ${!obs.isRunning ? 'disabled' : ''}>
+                            <button class="ctrl-btn btn-reset" style="background:#475569; white-space:nowrap; padding: 0 16px; font-size:13px;" 
+                                    ${!obs.isRunning ? 'disabled' : ''}
+                                    onclick="recordCustomAction(document.querySelector('.custom-action-input'), true)">加備註記錄</button>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4>報案人表觀特徵</h4>
+                        <div class="trait-grid">
+                            <div class="trait-group">
+                                <strong>性別</strong>
+                                <div class="btn-group">
+                                    <button class="select-btn ${obs.gender==='男'?'active':''}" onclick="setObsTrait('gender', '男', this)">男</button>
+                                    <button class="select-btn ${obs.gender==='女'?'active':''}" onclick="setObsTrait('gender', '女', this)">女</button>
+                                    <button class="select-btn ${obs.gender==='多人'?'active':''}" onclick="setObsTrait('gender', '多人', this)">多人</button>
+                                </div>
+                            </div>
+                            <div class="trait-group">
+                                <strong>年齡層</strong>
+                                <div class="btn-group">
+                                    <button class="select-btn ${obs.age==='30歲以下'?'active':''}" onclick="setObsTrait('age', '30歲以下', this)">30歲以下</button>
+                                    <button class="select-btn ${obs.age==='31-59歲'?'active':''}" onclick="setObsTrait('age', '31-59歲', this)">31-59歲</button>
+                                    <button class="select-btn ${obs.age==='60歲以上'?'active':''}" onclick="setObsTrait('age', '60歲以上', this)">60歲以上</button>
+                                </div>
+                            </div>
+                            <div class="trait-group">
+                                <strong>族裔</strong>
+                                <div class="btn-group">
+                                    <button class="select-btn ${obs.ethnicity==='華裔'?'active':''}" onclick="setObsTrait('ethnicity', '華裔', this)">華裔</button>
+                                    <button class="select-btn ${obs.ethnicity==='非華裔'?'active':''}" onclick="setObsTrait('ethnicity', '非華裔', this)">非華裔</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="submit-section">
+                        <button class="btn-submit" style="background-color: var(--neutral-gray-400);" onclick="submitCurrentObservation()">結束觀察</button>
+                    </div>
+                </div>
+            `;
+            renderTimelineData();
+            updateRealTimeClock();
+        }
+
+        function updateRealTimeClock() {
+            const clock = document.getElementById('realTimeClock');
+            if (clock) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('zh-HK', { hour12: false });
+                clock.textContent = `當前時間：${timeStr}`;
+            }
+        }
+
+        function renderTimelineData() {
+            const wrap = document.querySelector('[data-timeline-wrap]');
+            if (!wrap || !currentObs) return;
+            wrap.querySelectorAll('.timeline-dot, .timeline-event').forEach(el => el.remove());
+            const maxSec = Math.max(currentObs.elapsedSeconds, 60);
+            currentObs.timelineEvents.forEach(evt => {
+                let percent = (evt.timestamp / maxSec) * 100;
+                if (percent > 100) percent = 100;
+                let dot = document.createElement('div');
+                dot.className = `timeline-dot ${evt.isPending ? 'pending-dot' : ''}`;
+                dot.style.left = `${percent}%`;
+                wrap.appendChild(dot);
+                let box = document.createElement('div');
+                box.className = `timeline-event ${evt.isPending ? 'pending-event' : ''}`;
+                box.style.left = `${percent}%`;
+                const shortAction = evt.action.length > 8 ? evt.action.substring(0, 8) + '..' : evt.action;
+                box.innerText = evt.isPending ? `候補(${evt.timestamp}s)` : `${shortAction}(${evt.timestamp}s)`;
+                wrap.appendChild(box);
+            });
+        }
+
+        function updateTimer() {
+            if (currentObs && currentObs.isRunning) {
+                currentObs.elapsedSeconds++;
+                const timerDiv = document.querySelector('.col-stopwatch');
+                if (timerDiv) {
+                    const mins = Math.floor(currentObs.elapsedSeconds / 60).toString().padStart(2, '0');
+                    const secs = (currentObs.elapsedSeconds % 60).toString().padStart(2, '0');
+                    timerDiv.innerText = `${mins}:${secs}`;
+                    const timelineInfo = document.querySelector('.col-timeline-section strong');
+                    if (timelineInfo) timelineInfo.innerText = `${mins}:${secs}`;
+                }
+                const nowLine = document.querySelector('[data-timeline-now]');
+                if (nowLine) {
+                    const maxSec = Math.max(currentObs.elapsedSeconds, 60);
+                    let nowPercent = (currentObs.elapsedSeconds / maxSec) * 100;
+                    nowLine.style.left = `${nowPercent > 100 ? 100 : nowPercent}%`;
+                }
+                if (currentObs.elapsedSeconds % 5 === 0) {
+                    saveLocalStorage();
+                }
+            }
+            updateRealTimeClock();
+        }
+
+        function startTimer() {
+            if (!currentObs.startTime) {
+                currentObs.startTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
+            }
+            currentObs.isRunning = true;
+            if (currentObs.timelineEvents.length === 0) {
+                executeAddEvent('進入報案室', '系統自動生成（開始觀察）', false);
+            } else {
+                renderObservationCard();
+                syncCurrentObsToAllRecords();
+                refreshTable();
+            }
+        }
+
+        function resetTimer() {
+            if (confirm("確定要取消當前報案人的所有記錄嗎？(此動作無法復原)")) {
+                allRecords = allRecords.filter(r => r.obsIndex !== currentObs.caseIndex);
+                currentObs = createBlankObsItem();
+                renderObservationCard();
+                refreshTable();
+                saveLocalStorage();
+            }
+        }
+
+        function syncCurrentObsToAllRecords() {
+            if (!currentObs) return;
+            allRecords = allRecords.filter(r => r.obsIndex !== currentObs.caseIndex);
+            const obsName = document.getElementById('observerName').value;
+            const oDate = document.getElementById('obsDate').value;
+            const counts = getCountValues();
+
+            let ethnicityValue = currentObs.ethnicity;
+            if (ethnicityValue === '未選擇' || ethnicityValue === '') {
+                ethnicityValue = '不詳';
+            }
+
+            currentObs.timelineEvents.forEach(evt => {
+                allRecords.push({
+                    obsIndex: currentObs.caseIndex,
+                    observer: obsName,
+                    date: oDate,
+                    period: globalPeriod,
+                    division: globalDivision,
+                    observerCount: counts.observerCount,
+                    staffCount: counts.staffCount,
+                    counterCount: counts.counterCount,
+                    startTime: currentObs.startTime,
+                    endTime: currentObs.endTime,
+                    gender: currentObs.gender,
+                    age: currentObs.age,
+                    ethnicity: ethnicityValue,
+                    action: evt.action,
+                    note: evt.note,
+                    stageDuration: evt.stageDuration,
+                    totalDuration: evt.timestamp,
+                    recordTime: evt.recordTime,
+                    uuid: evt.uuid
+                });
+            });
+            saveLocalStorage();
+        }
+
+        function executeAddEvent(actionName, note = "", isPending = false) {
+            let lastTime = 0;
+            if (currentObs.timelineEvents.length > 0) {
+                lastTime = currentObs.timelineEvents[currentObs.timelineEvents.length - 1].timestamp;
+            }
+            const stageDur = currentObs.elapsedSeconds - lastTime;
+            const newEvent = {
+                uuid: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                timestamp: currentObs.elapsedSeconds,
+                action: actionName,
+                note: note,
+                stageDuration: stageDur,
+                isPending: isPending,
+                recordTime: new Date().toLocaleTimeString('zh-HK', { hour12: false })
+            };
+            currentObs.timelineEvents.push(newEvent);
+            renderObservationCard();
+            syncCurrentObsToAllRecords();
+            refreshTable();
+
+            // 自動同步到雲端
+            syncToCloud().catch(e => console.error('同步失敗:', e));
+        }
+
+        function recordAction(actName) {
+            executeAddEvent(actName, "", false);
+        }
+
+        function recordActionWithNote(actName) {
+            openCustomModal({
+                title: `為「${actName}」加入動作備註`,
+                placeholder: "請填寫有關此動作的詳細情況（非必填）",
+                showSkip: true,
+                onSave: (noteVal) => {
+                    executeAddEvent(actName, noteVal, false);
+                }
+            });
+        }
+
+        function recordLeaveAction(withNote) {
+            if (!currentObs.isRunning) return;
+            const proceedLeaveWorkflow = (noteVal = "") => {
+                let lastTime = 0;
+                if (currentObs.timelineEvents.length > 0) {
+                    lastTime = currentObs.timelineEvents[currentObs.timelineEvents.length - 1].timestamp;
+                }
+                const stageDur = currentObs.elapsedSeconds - lastTime;
+                const leaveEvent = {
+                    uuid: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                    timestamp: currentObs.elapsedSeconds,
+                    action: '離開報案室',
+                    note: noteVal || '點選自動結案',
+                    stageDuration: stageDur,
+                    isPending: false,
+                    recordTime: new Date().toLocaleTimeString('zh-HK', { hour12: false })
+                };
+                currentObs.timelineEvents.push(leaveEvent);
+                currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
+                currentObs.isRunning = false;
+                syncCurrentObsToAllRecords();
+
+                // 同步到雲端
+                syncToCloud().catch(e => console.error('同步失敗:', e));
+
+                if (currentObs.timelineEvents.some(e => e.isPending)) {
+                    alert('已寫入「離開報案室」，但當前時間線中仍存在「候補時間點」未命名，請稍後在下方總表中補齊。');
+                } else {
+                    alert('報案人已離開！數據已成功鎖定存檔，系統已自動生成下一個全新的隨機個案。');
+                }
+                currentObs = createBlankObsItem();
+                saveLocalStorage();
+                renderObservationCard();
+                refreshTable();
+            };
+            if (withNote) {
+                openCustomModal({
+                    title: `為「離開報案室」加入終端備註`,
+                    placeholder: "請輸入離開時的狀態描述...",
+                    showSkip: true,
+                    onSave: (noteVal) => { proceedLeaveWorkflow(noteVal); }
+                });
+            } else {
+                if (confirm('確認記錄「離開報案室」並立刻結案封存當前個案嗎？')) {
+                    proceedLeaveWorkflow("");
+                }
+            }
+        }
+
+        function quickMark() {
+            executeAddEvent("", "", true);
+        }
+
+        function recordCustomAction(inputEl, forceNote) {
+            const val = inputEl.value.trim();
+            if (!val) return;
+            if (forceNote) {
+                openCustomModal({
+                    title: `為自訂動作「${val}」加入備註`,
+                    placeholder: "請填寫對應備註...",
+                    showSkip: true,
+                    onSave: (noteVal) => {
+                        executeAddEvent(val, noteVal, false);
+                        inputEl.value = "";
+                    }
+                });
+            } else {
+                executeAddEvent(val, "", false);
+                inputEl.value = "";
+            }
+        }
+
+        function setObsTrait(trait, val, el) {
+            currentObs[trait] = val;
+            [...el.parentElement.children].forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            syncCurrentObsToAllRecords();
+            refreshTable();
+        }
+
+        function changeCaseId(inputEl) {
+            const newVal = inputEl.value.trim();
+            if(!newVal) {
+                inputEl.value = currentObs.caseIndex;
+                return;
+            }
+            allRecords.forEach(r => {
+                if(r.obsIndex === currentObs.caseIndex) r.obsIndex = newVal;
+            });
+            currentObs.caseIndex = newVal;
+            saveLocalStorage();
+            refreshTable();
+        }
+
+        function updateTableFieldDirectly(uuid, field, val) {
+            const rec = allRecords.find(r => r.uuid === uuid);
+            if(rec) {
+                rec[field] = val;
+                if(field === 'action') {
+                    rec.isPending = false;
+                    if (currentObs) {
+                        const innerEvt = currentObs.timelineEvents.find(e => e.uuid === uuid);
+                        if(innerEvt) {
+                            innerEvt.action = val;
+                            innerEvt.isPending = false;
+                        }
+                    }
+                } else if (field === 'note') {
+                    if (currentObs) {
+                        const innerEvt = currentObs.timelineEvents.find(e => e.uuid === uuid);
+                        if(innerEvt) {
+                            innerEvt.note = val;
+                        }
+                    }
+                }
+            }
+            saveLocalStorage();
+            refreshTable();
+            const banner = document.querySelector('.pending-banner');
+            if (currentObs) {
+                const hasPending = currentObs.timelineEvents.some(e => e.isPending);
+                if (!hasPending && banner) banner.remove();
+                renderTimelineData();
+            }
+        }
+
+        function fillPendingName() {
+            const pEvt = currentObs.timelineEvents.find(e => e.isPending);
+            if (!pEvt) return;
+            openCustomModal({
+                title: `命名候補時間點 (${pEvt.timestamp}秒)`,
+                placeholder: "請填寫此時間點發生的具體行為動作（必填）",
+                showSkip: false,
+                onSave: (val) => {
+                    if(!val.trim()) {
+                        alert('動作名稱不能留空！');
+                        return;
+                    }
+                    pEvt.action = val.trim();
+                    pEvt.isPending = false;
+                    syncCurrentObsToAllRecords();
+                    renderObservationCard();
+                    refreshTable();
+                    setTimeout(() => {
+                        if(currentObs.timelineEvents.some(e => e.isPending)) fillPendingName();
+                    }, 200);
+                }
+            });
+        }
+
+        function submitCurrentObservation() {
+            if (!currentObs || currentObs.timelineEvents.length === 0) {
+                alert('當前個案未有任何行為動作記錄，無法提交！');
+                return;
+            }
+            if (currentObs.timelineEvents.some(e => e.isPending)) {
+                alert('請先補齊所有「候補時間點」的動作名稱再進行結案提交！');
+                return;
+            }
+            if(!confirm('確認手動強制結束並儲存當前個案嗎？')) return;
+            currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
+            currentObs.isRunning = false;
+            syncCurrentObsToAllRecords();
+
+            // 同步到雲端
+            syncToCloud().catch(e => console.error('同步失敗:', e));
+
+            currentObs = createBlankObsItem();
+            saveLocalStorage();
+            renderObservationCard();
+            refreshTable();
+            alert('個案觀察已成功儲存並封存！');
+        }
+
+        function refreshTable() {
+            const tbody = document.getElementById('data-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            allRecords.forEach(rec => {
+                const tr = document.createElement('tr');
+                const fields = [
+                    { key: 'obsIndex', editable: false },
+                    { key: 'observer', editable: true },
+                    { key: 'date', editable: true },
+                    { key: 'period', editable: true },
+                    { key: 'division', editable: true },
+                    { key: 'observerCount', editable: true, type: 'number' },
+                    { key: 'staffCount', editable: true, type: 'number' },
+                    { key: 'counterCount', editable: true, type: 'number' },
+                    { key: 'startTime', editable: true },
+                    { key: 'endTime', editable: true },
+                    { key: 'gender', editable: true },
+                    { key: 'age', editable: true },
+                    { key: 'ethnicity', editable: true },
+                    { key: 'action', editable: true, isAction: true },
+                    { key: 'note', editable: true, isNote: true },
+                    { key: 'stageDuration', editable: true },
+                    { key: 'totalDuration', editable: true },
+                    { key: 'recordTime', editable: true }
+                ];
+
+                fields.forEach(f => {
+                    const td = document.createElement('td');
+                    if (f.editable) {
+                        const input = document.createElement('input');
+                        input.type = f.type === 'number' ? 'number' : 'text';
+                        input.className = 'table-input';
+                        if (f.isAction) input.classList.add('action-input');
+                        let value = rec[f.key] !== undefined ? rec[f.key] : '';
+                        if (value === null || value === undefined) value = '';
+                        input.value = value;
+                        input.placeholder = '...';
+                        input.onchange = function() {
+                            let val = this.value;
+                            if (f.type === 'number') {
+                                val = parseInt(val) || 0;
+                            }
+                            updateTableFieldDirectly(rec.uuid, f.key, val);
+                        };
+                        td.appendChild(input);
+                    } else {
+                        td.textContent = rec.obsIndex || '';
+                        td.style.fontWeight = 'bold';
+                        td.style.color = 'var(--police-blue)';
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openCustomModal({ title, placeholder, showSkip, onSave }) {
+            const exist = document.getElementById('dynamicModal');
+            if(exist) exist.remove();
+            const mask = document.createElement('div');
+            mask.className = 'modal-mask';
+            mask.id = 'dynamicModal';
+            mask.innerHTML = `
+                <div class="modal-box">
+                    <div class="modal-title">${title}</div>
+                    <textarea class="modal-textarea" placeholder="${placeholder}"></textarea>
+                    <div class="modal-buttons">
+                        <button class="modal-btn modal-cancel" id="mCancel">取消</button>
+                        ${showSkip ? `<button class="modal-btn modal-skip" id="mSkip">略過備註</button>` : ''}
+                        <button class="modal-btn modal-save" id="mSave">確認儲存</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(mask);
+            const txt = mask.querySelector('.modal-textarea');
+            txt.focus();
+            mask.querySelector('#mCancel').onclick = () => mask.remove();
+            if(showSkip) {
+                mask.querySelector('#mSkip').onclick = () => {
+                    onSave("");
+                    mask.remove();
+                };
+            }
+            mask.querySelector('#mSave').onclick = () => {
+                onSave(txt.value.trim());
+                mask.remove();
+            };
+        }
+
+        function saveLocalStorage() {
+            localStorage.setItem('observerName', document.getElementById('observerName').value);
+            localStorage.setItem('obsDate', document.getElementById('obsDate').value);
+            localStorage.setItem('globalDivision', globalDivision);
+            localStorage.setItem('globalPeriod', globalPeriod);
+            const counts = getCountValues();
+            localStorage.setItem('observerCount', counts.observerCount);
+            localStorage.setItem('staffCount', counts.staffCount);
+            localStorage.setItem('counterCount', counts.counterCount);
+            localStorage.setItem('allRecords', JSON.stringify(allRecords));
+            localStorage.setItem('currentObs', JSON.stringify(currentObs));
+        }
+
+        function loadLocalStorage() {
+            if(localStorage.getItem('observerName')) document.getElementById('observerName').value = localStorage.getItem('observerName');
+            if(localStorage.getItem('obsDate')) document.getElementById('obsDate').value = localStorage.getItem('obsDate');
+            if(localStorage.getItem('observerCount')) document.getElementById('observerCount').value = localStorage.getItem('observerCount');
+            if(localStorage.getItem('staffCount')) document.getElementById('staffCount').value = localStorage.getItem('staffCount');
+            if(localStorage.getItem('counterCount')) document.getElementById('counterCount').value = localStorage.getItem('counterCount');
+            globalDivision = localStorage.getItem('globalDivision') || "";
+            globalPeriod = localStorage.getItem('globalPeriod') || "";
+            document.querySelectorAll('#divisionGroup .select-btn').forEach(b => {
+                if(b.getAttribute('onclick').includes(`'${globalDivision}'`)) b.classList.add('active');
+            });
+            document.querySelectorAll('#periodGroup .select-btn').forEach(b => {
+                if(b.getAttribute('onclick').includes(`'${globalPeriod}'`)) b.classList.add('active');
+            });
+            allRecords = JSON.parse(localStorage.getItem('allRecords')) || [];
+            if(localStorage.getItem('currentObs')) {
+                currentObs = JSON.parse(localStorage.getItem('currentObs'));
+            }
+        }
+
+        function clearAllRecords() {
+            if(confirm('警告：這將會清空數據庫中「全部」已記錄的報案人行為歷史，且無法還原！\n確認清空？')) {
+                allRecords = [];
+                currentObs = createBlankObsItem();
+                saveLocalStorage();
+                renderObservationCard();
+                refreshTable();
+                alert('所有歷史記錄已全部清空。');
+            }
+        }
+
+        function exportCSV() {
+            if (allRecords.length === 0) {
+                alert('當前數據庫中沒有任何資料可供匯出！');
+                return;
+            }
+            const headers = ['報案人編號', '觀察者', '觀察日期', '觀察時段', '報案室', '觀察員數目', '職員數目', '開放櫃枱數目', '開始時間', '結束時間', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
+            let csvContent = "\uFEFF" + headers.join(",") + "\n";
+            allRecords.forEach(rec => {
+                const row = [
+                    rec.obsIndex,
+                    rec.observer || '',
+                    rec.date || '',
+                    rec.period || '',
+                    rec.division || '',
+                    rec.observerCount !== undefined ? rec.observerCount : '',
+                    rec.staffCount !== undefined ? rec.staffCount : '',
+                    rec.counterCount !== undefined ? rec.counterCount : '',
+                    rec.startTime || '',
+                    rec.endTime || '',
+                    rec.gender,
+                    rec.age,
+                    rec.ethnicity,
+                    rec.action,
+                    rec.note || '',
+                    rec.stageDuration,
+                    rec.totalDuration,
+                    rec.recordTime
+                ].map(v => `"${String(v).replace(/"/g, '""')}"`);
+                csvContent += row.join(",") + "\n";
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `報案室觀察數據匯總_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function removeEmoji(str) {
+            if (!str) return '';
+            return str.replace(/[\p{Emoji}\u{FE0F}]/gu, '').trim();
+        }
+
+        function exportExcel() {
+            if (allRecords.length === 0) {
+                alert('無任何數據可匯出！');
+                return;
+            }
+
+            const groups = {};
+            allRecords.forEach(rec => {
+                if (!groups[rec.obsIndex]) groups[rec.obsIndex] = [];
+                groups[rec.obsIndex].push(rec);
+            });
+
+            const wb = XLSX.utils.book_new();
+
+            for (const [obsIndex, records] of Object.entries(groups)) {
+                records.sort((a, b) => (a.recordTime || '').localeCompare(b.recordTime || ''));
+                const first = records[0];
+                const data = [];
+
+                data.push(['觀察者姓名：', first.observer || '']);
+                data.push(['日期：', first.date || '', '時段：', first.period || '', '報案室：', first.division || '']);
+                data.push(['觀察開始時間：', first.startTime || '', '觀察完成時間：', first.endTime || '']);
+                data.push(['觀察員數目：', first.observerCount || '', '職員數目：', first.staffCount || '', '開放櫃枱數目：', first.counterCount || '']);
+                data.push([]);
+                data.push(['報案人編號：', obsIndex, '性別：', first.gender || '', '年齡：', first.age || '', '族裔：', first.ethnicity || '']);
+                data.push([]);
+                data.push(['日期', '記錄時間', '行為動作', '階段歷時(秒)', '總時長(秒)', '備註']);
+
+                records.forEach(rec => {
+                    data.push([
+                        rec.date || '',
+                        rec.recordTime || '',
+                        removeEmoji(rec.action || ''),
+                        rec.stageDuration !== undefined ? rec.stageDuration : '',
+                        rec.totalDuration !== undefined ? rec.totalDuration : '',
+                        rec.note || ''
+                    ]);
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                ws['!cols'] = [
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 30 },
+                    { wch: 18 },
+                    { wch: 18 },
+                    { wch: 25 }
+                ];
+                let sheetName = obsIndex.replace(/[\\:*?/\[\]]/g, '').substring(0, 31);
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            }
+
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `報案室觀察報告_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        function submitToNetlify() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何觀察記錄可提交！請先完成至少一個報案人的記錄。');
+                return;
+            }
+
+            const observer = document.getElementById('observerName').value || '未填寫';
+            const date = document.getElementById('obsDate').value || '未填寫';
+            const period = globalPeriod || '未選擇';
+            const division = globalDivision || '未選擇';
+            const counts = getCountValues();
+            const recordsJson = JSON.stringify(allRecords);
+
+            const form = document.createElement('form');
+            form.setAttribute('netlify', 'true');
+            form.setAttribute('name', 'observation-data');
+            form.setAttribute('method', 'POST');
+            form.setAttribute('action', '/');
+            form.style.display = 'none';
+
+            const fields = {
+                'form-name': 'observation-data',
+                'observer': observer,
+                'date': date,
+                'period': period,
+                'division': division,
+                'observer_count': counts.observerCount,
+                'staff_count': counts.staffCount,
+                'counter_count': counts.counterCount,
+                'records_data': recordsJson,
+                'total_events': allRecords.length
+            };
+
+            for (const [key, value] of Object.entries(fields)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+
+            setTimeout(() => {
+                alert('數據已提交！請稍後回到 Netlify 後台的「Forms」頁面查看。');
+            }, 500);
+        }
+    </script>
+</body>
+</html>
