@@ -405,6 +405,39 @@
         .action-pair.group-5 .action-btn-note { background: #00838F; color: #fff; border-left-color: #4DD0E1; }
         .action-pair.group-5 .action-btn-note:hover:not(:disabled) { background: #006064; }
 
+        /* ===== 櫃枱號碼按鈕樣式 ===== */
+        .counter-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 0 6px;
+            flex-shrink: 0;
+        }
+        .counter-btn {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #7B1FA2;
+            border-radius: 50%;
+            background: #F3E5F5;
+            color: #4A148C;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .counter-btn:hover:not(:disabled) {
+            background: #7B1FA2;
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .counter-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         .action-btn-main {
             flex: 1;
             padding: 10px 12px;
@@ -1081,6 +1114,14 @@
             .admin-title {
                 font-size: 20px;
             }
+            .counter-btn {
+                width: 24px;
+                height: 24px;
+                font-size: 11px;
+            }
+            .action-pair.group-4 {
+                flex-wrap: wrap;
+            }
         }
         @media (max-width: 768px) {
             .home-wrapper, .select-observer-wrapper, .admin-wrapper {
@@ -1091,6 +1132,13 @@
             }
             .admin-stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .action-pair.group-4 {
+                flex-wrap: wrap;
+                padding-bottom: 6px;
+            }
+            .counter-btn-group {
+                padding: 4px 6px;
             }
         }
     </style>
@@ -1715,13 +1763,6 @@
         // ================================================================
         // 行為動作清單（五種顏色分組）
         // ================================================================
-        // 動作與顏色分組對應
-        // group-1 (藍色) : 留意到...
-        // group-2 (綠色) : 設施類
-        // group-3 (橙色) : 諮詢類
-        // group-4 (紫色) : 接待類
-        // group-5 (青色) : 完成類
-
         const actionGroups = [
             { action: '留意到取票機', group: 'group-1' },
             { action: '留意到自助服務機', group: 'group-1' },
@@ -1912,10 +1953,33 @@
                 `;
             }
 
-            // 生成動作按鈕（含顏色分組）
+            // 生成動作按鈕（含顏色分組 + 櫃枱接待報案特殊處理）
             let actionsHtml = actionGroups.map(item => {
                 const act = item.action;
                 const group = item.group;
+                
+                // 特殊處理：櫃枱接待報案 → 加上 1-5 數字按鈕
+                if (act === '櫃枱接待報案') {
+                    const numberBtns = [1, 2, 3, 4, 5].map(num => `
+                        <button class="counter-btn" ${!obs.isRunning ? 'disabled' : ''} 
+                                onclick="recordAction('${num}號櫃枱接待報案')" 
+                                title="記錄 ${num} 號櫃枱接待報案">
+                            ${num}
+                        </button>
+                    `).join('');
+                    
+                    return `
+                        <div class="action-pair ${group}" style="flex-wrap: wrap; padding-right: 8px;">
+                            <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
+                            <div class="counter-btn-group">
+                                ${numberBtns}
+                            </div>
+                            <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
+                        </div>
+                    `;
+                }
+                
+                // 其他動作正常顯示
                 return `
                     <div class="action-pair ${group}">
                         <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
@@ -1923,6 +1987,14 @@
                     </div>
                 `;
             }).join('');
+
+            // 離開報案室按鈕（紅色）
+            actionsHtml += `
+                <div class="action-pair" style="border: 1px solid var(--warning-red); background: var(--danger-bg);">
+                    <button class="action-btn-main" style="background: var(--danger-bg); color: var(--warning-red); font-weight: 700;" ${!obs.isRunning ? 'disabled' : ''} onclick="recordLeaveAction(false)">離開報案室</button>
+                    <button class="action-btn-note" style="background: var(--warning-red); color: white;" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordLeaveAction(true)">備註</button>
+                </div>
+            `;
 
             container.innerHTML = `
                 <div class="${cardClass}" data-id="${obs.id}">
