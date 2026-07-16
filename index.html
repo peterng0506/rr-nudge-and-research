@@ -26,7 +26,6 @@
             --radius-sm: 6px;
             --radius-md: 12px;
             --transition-fast: all 0.2s ease-in-out;
-            --netlify-purple: #00AD9F;
             --google-blue: #4285F4;
         }
         * { box-sizing: border-box; }
@@ -375,44 +374,71 @@
         .action-pair:hover {
             border-color: var(--police-light-blue);
         }
+        /* ===== 動作按鈕五種顏色 ===== */
+        .action-pair.group-1 { background: #E3F2FD; border-color: #64B5F6; }
+        .action-pair.group-1 .action-btn-main { background: #E3F2FD; color: #0D47A1; }
+        .action-pair.group-1 .action-btn-main:hover:not(:disabled) { background: #BBDEFB; }
+        .action-pair.group-1 .action-btn-note { background: #1976D2; color: #fff; border-left-color: #64B5F6; }
+        .action-pair.group-1 .action-btn-note:hover:not(:disabled) { background: #0D47A1; }
+
+        .action-pair.group-2 { background: #E8F5E9; border-color: #81C784; }
+        .action-pair.group-2 .action-btn-main { background: #E8F5E9; color: #1B5E20; }
+        .action-pair.group-2 .action-btn-main:hover:not(:disabled) { background: #C8E6C9; }
+        .action-pair.group-2 .action-btn-note { background: #388E3C; color: #fff; border-left-color: #81C784; }
+        .action-pair.group-2 .action-btn-note:hover:not(:disabled) { background: #1B5E20; }
+
+        .action-pair.group-3 { background: #FFF3E0; border-color: #FFB74D; }
+        .action-pair.group-3 .action-btn-main { background: #FFF3E0; color: #E65100; }
+        .action-pair.group-3 .action-btn-main:hover:not(:disabled) { background: #FFE0B2; }
+        .action-pair.group-3 .action-btn-note { background: #F57C00; color: #fff; border-left-color: #FFB74D; }
+        .action-pair.group-3 .action-btn-note:hover:not(:disabled) { background: #E65100; }
+
+        .action-pair.group-4 { background: #F3E5F5; border-color: #BA68C8; }
+        .action-pair.group-4 .action-btn-main { background: #F3E5F5; color: #4A148C; }
+        .action-pair.group-4 .action-btn-main:hover:not(:disabled) { background: #E1BEE7; }
+        .action-pair.group-4 .action-btn-note { background: #7B1FA2; color: #fff; border-left-color: #BA68C8; }
+        .action-pair.group-4 .action-btn-note:hover:not(:disabled) { background: #4A148C; }
+
+        .action-pair.group-5 { background: #E0F7FA; border-color: #4DD0E1; }
+        .action-pair.group-5 .action-btn-main { background: #E0F7FA; color: #006064; }
+        .action-pair.group-5 .action-btn-main:hover:not(:disabled) { background: #B2EBF2; }
+        .action-pair.group-5 .action-btn-note { background: #00838F; color: #fff; border-left-color: #4DD0E1; }
+        .action-pair.group-5 .action-btn-note:hover:not(:disabled) { background: #006064; }
+
         .action-btn-main {
             flex: 1;
             padding: 10px 12px;
             font-size: 13px;
-            background: var(--neutral-gray-50);
             border: none;
             cursor: pointer;
             text-align: left;
-            font-weight: 500;
-            color: var(--neutral-gray-800);
+            font-weight: 600;
             transition: var(--transition-fast);
         }
-        .action-btn-main:hover:not(:disabled) {
-            background: var(--neutral-gray-100);
+        .action-btn-main:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .action-btn-note {
-            background: var(--neutral-gray-100);
+            padding: 0 10px;
             border: none;
             border-left: 1px solid var(--neutral-gray-200);
-            padding: 0 10px;
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--neutral-gray-800);
-            transition: var(--transition-fast);
             white-space: nowrap;
+            transition: var(--transition-fast);
+            min-width: 50px;
         }
-        .action-btn-note:hover:not(:disabled) {
-            background: var(--police-light-blue);
-            color: white;
-        }
-        .action-btn-main:disabled, .action-btn-note:disabled {
+        .action-btn-note:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            background: var(--neutral-gray-100);
+        }
+        .action-btn-note:hover:not(:disabled) {
+            filter: brightness(0.9);
         }
         .quick-btn {
             grid-column: 1 / -1;
@@ -553,7 +579,7 @@
             gap: 12px;
             margin-top: 16px;
         }
-        .export-btn, .clear-btn, .excel-btn, .netlify-btn, .google-btn {
+        .export-btn, .clear-btn, .excel-btn, .google-btn {
             flex: 1;
             min-width: 150px;
             padding: 12px;
@@ -568,12 +594,10 @@
         .export-btn { background-color: var(--neutral-gray-800); color: white; }
         .clear-btn { background-color: #64748B; color: white; }
         .excel-btn { background-color: #1e6f3f; color: white; }
-        .netlify-btn { background-color: var(--netlify-purple); color: white; }
         .google-btn { background-color: var(--google-blue); color: white; }
         .export-btn:hover { background-color: #0F172A; }
         .clear-btn:hover { background-color: #475569; }
         .excel-btn:hover { background-color: #14532d; }
-        .netlify-btn:hover { background-color: #008A7E; }
         .google-btn:hover { background-color: #3367D6; }
         .modal-mask {
             position: fixed;
@@ -1085,7 +1109,7 @@
             <div class="home-subtitle">報案室行為觀察系統</div>
             <div class="home-buttons">
                 <button class="home-btn admin" onclick="goToAdmin()">Administrator</button>
-                <button class="home-btn observer" onclick="goToSelectObserver()">Observar</button>
+                <button class="home-btn observer" onclick="goToSelectObserver()">Observer</button>
             </div>
         </div>
     </div>
@@ -1125,14 +1149,19 @@
 
         <div style="margin-bottom: 16px; text-align: right;">
             <button class="back-btn" onclick="goHome()">返回首頁</button>
-            <button class="ctrl-btn btn-reset" onclick="loadAdminData()" style="background: var(--police-blue); color: #fff; margin-left: 8px;">🔄 重新整理</button>
         </div>
 
         <div class="admin-wrapper">
             <div class="admin-title">管理員儀表板</div>
-            <div class="admin-subtitle">觀察員填寫進度總覽（自動從雲端同步）</div>
+            <div class="admin-subtitle">觀察員填寫進度總覽</div>
 
-            <!-- 統計總覽 -->
+            <div class="admin-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="icon">📤</div>
+                <div class="text">拖曳 <strong>CSV 檔案</strong> 到這裡，或點擊上傳</div>
+                <div class="sub-text">支援從 Google Sheets 下載的 CSV 檔案</div>
+                <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleFileUpload(event)">
+            </div>
+
             <div class="admin-stats-grid" id="adminStatsGrid">
                 <div class="admin-stat-card">
                     <div class="admin-stat-number" id="totalCases">0</div>
@@ -1152,13 +1181,11 @@
                 </div>
             </div>
 
-            <!-- 觀察員進度卡片 -->
             <h4 style="margin-bottom:12px;">觀察員進度</h4>
             <div class="admin-observer-grid" id="adminObserverGrid">
-                <div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">載入中...</div>
+                <div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">請上傳 CSV 檔案以查看數據</div>
             </div>
 
-            <!-- 詳細數據表格 -->
             <h4 style="margin-bottom:12px;">所有案件明細</h4>
             <div class="admin-table-wrap">
                 <table id="adminDetailTable">
@@ -1174,17 +1201,15 @@
                         </tr>
                     </thead>
                     <tbody id="adminDetailBody">
-                        <tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">載入中...</td></tr>
+                        <tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">請上傳 CSV 檔案以查看數據</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="last-updated" id="adminLastUpdated">最後更新：--</div>
-
-            <!-- 操作按鈕 -->
             <div class="admin-actions">
                 <button class="admin-btn" onclick="exportAdminCSV()">匯出全部數據 (CSV)</button>
                 <button class="excel-btn" onclick="exportAdminExcel()">匯出 Excel 報告</button>
+                <button class="clear-btn" onclick="clearAdminData()">清除數據</button>
             </div>
         </div>
     </div>
@@ -1193,18 +1218,6 @@
     <!-- 觀察頁 -->
     <!-- ============================================================ -->
     <div id="page-observer" class="page-container">
-        <form name="observation-data" netlify netlify-honeypot="bot-field" hidden>
-            <input type="hidden" name="form-name" value="observation-data">
-            <input type="text" name="observer" />
-            <input type="text" name="date" />
-            <input type="text" name="period" />
-            <input type="text" name="division" />
-            <input type="text" name="observer_count" />
-            <input type="text" name="staff_count" />
-            <input type="text" name="counter_count" />
-            <textarea name="records_data"></textarea>
-        </form>
-
         <div class="privacy-banner">
             保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
         </div>
@@ -1293,7 +1306,7 @@
             <div class="table-btn-group">
                 <button class="export-btn" onclick="exportCSV()">匯出全部CSV數據</button>
                 <button class="excel-btn" onclick="exportExcel()">匯出為 Excel 報告</button>
-                <button class="netlify-btn" onclick="submitToNetlify()">提交至後台 (Netlify)</button>
+                <button class="google-btn" onclick="submitToGoogleSheets()">提交至 Google Sheets</button>
                 <button class="clear-btn" onclick="clearAllRecords()">清空全部記錄</button>
             </div>
         </div>
@@ -1304,247 +1317,10 @@
     <!-- ============================================================ -->
     <script>
         // ================================================================
-        // Netlify Blob Storage 設定
-        // 請將 YOUR_NETLIFY_SITE_ID 換成您的 Site ID
+        // Google Sheets 設定
+        // 請將下面的網址換成您的 Google Apps Script Web App 網址
         // ================================================================
-        const NETLIFY_SITE_ID = 'YOUR_NETLIFY_SITE_ID';  // ← 請修改這裡！
-
-        // 儲存觀察者數據的 key
-        const STORAGE_KEY = 'observation_data';
-
-        // ===== Netlify Blob 操作函數 =====
-
-        // 讀取所有觀察數據
-        async function fetchAllData() {
-            try {
-                const url = `/.netlify/functions/blob?siteId=${NETLIFY_SITE_ID}&key=${STORAGE_KEY}`;
-                const response = await fetch(url);
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        return {}; // 尚無數據
-                    }
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('讀取數據失敗:', error);
-                return {};
-            }
-        }
-
-        // 寫入數據
-        async function saveData(data) {
-            try {
-                const response = await fetch('/.netlify/functions/blob', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        siteId: NETLIFY_SITE_ID,
-                        key: STORAGE_KEY,
-                        data: data
-                    })
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                return true;
-            } catch (error) {
-                console.error('儲存數據失敗:', error);
-                return false;
-            }
-        }
-
-        // ===== 觀察者數據同步（自動） =====
-
-        // 將當前記錄同步到雲端
-        async function syncToCloud() {
-            if (allRecords.length === 0) return;
-
-            const observer = document.getElementById('observerName').value || '未填寫';
-            
-            // 讀取現有雲端數據
-            const cloudData = await fetchAllData();
-            
-            // 更新該觀察者的記錄
-            cloudData[observer] = {
-                records: allRecords.slice(),
-                lastUpdated: new Date().toISOString()
-            };
-
-            // 寫回雲端
-            await saveData(cloudData);
-            console.log(`✅ 已同步 ${allRecords.length} 筆記錄到雲端`);
-        }
-
-        // ===== Admin 頁面載入數據 =====
-
-        async function loadAdminData() {
-            const grid = document.getElementById('adminObserverGrid');
-            const tbody = document.getElementById('adminDetailBody');
-            const lastUpdated = document.getElementById('adminLastUpdated');
-
-            // 顯示載入中
-            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">載入中...</div>';
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">載入中...</td></tr>';
-
-            try {
-                const cloudData = await fetchAllData();
-                const observers = Object.keys(cloudData);
-                
-                if (observers.length === 0) {
-                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無數據，請等待觀察員開始記錄</div>';
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
-                    lastUpdated.textContent = '最後更新：' + new Date().toLocaleTimeString('zh-HK');
-                    updateStats({});
-                    return;
-                }
-
-                // 收集所有案件
-                let allCases = [];
-                let observerCaseCount = {};
-
-                observers.forEach(obs => {
-                    const records = cloudData[obs].records || [];
-                    observerCaseCount[obs] = records.length;
-                    records.forEach(record => {
-                        allCases.push({
-                            ...record,
-                            observerName: obs
-                        });
-                    });
-                });
-
-                // 更新統計
-                updateStats({ allCases, observerCaseCount, observers });
-
-                // 渲染觀察員卡片
-                renderObserverCards(observerCaseCount);
-
-                // 渲染詳細表格
-                renderAdminTable(allCases);
-
-                lastUpdated.textContent = '最後更新：' + new Date().toLocaleTimeString('zh-HK');
-
-            } catch (error) {
-                console.error('載入數據失敗:', error);
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--warning-red);padding:20px;">載入失敗，請點擊「重新整理」重試</div>';
-            }
-        }
-
-        function updateStats(data) {
-            const allCases = data.allCases || [];
-            const observers = data.observers || [];
-            const totalCases = allCases.length;
-            const totalObservers = observers.length;
-            const totalSubmitted = allCases.filter(c => c.endTime).length;
-            const totalActive = allCases.filter(c => !c.endTime).length;
-
-            document.getElementById('totalCases').textContent = totalCases;
-            document.getElementById('totalObservers').textContent = totalObservers;
-            document.getElementById('totalSubmitted').textContent = totalSubmitted;
-            document.getElementById('totalActive').textContent = totalActive;
-        }
-
-        function renderObserverCards(observerCaseCount) {
-            const grid = document.getElementById('adminObserverGrid');
-            grid.innerHTML = '';
-
-            const observerNames = Object.keys(observerCaseCount);
-            if (observerNames.length === 0) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無觀察員數據</div>';
-                return;
-            }
-
-            observerNames.forEach(name => {
-                const caseCount = observerCaseCount[name];
-                const completionRate = caseCount > 0 ? Math.min(100, caseCount * 10) : 0; // 假設目標為 10 個案件
-
-                let progressClass = 'admin-observer-progress-bar';
-                if (completionRate < 30) progressClass += ' low';
-                else if (completionRate < 70) progressClass += ' partial';
-
-                const card = document.createElement('div');
-                card.className = 'admin-observer-card';
-                card.innerHTML = `
-                    <div class="admin-observer-name">${name}</div>
-                    <div class="admin-observer-stats">
-                        <span><span class="stat-value">${caseCount}</span> <span class="stat-label">總案件</span></span>
-                        <span><span class="stat-value">${Math.round(completionRate)}%</span> <span class="stat-label">完成率</span></span>
-                    </div>
-                    <div class="admin-observer-progress">
-                        <div class="${progressClass}" style="width:${completionRate}%;"></div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function renderAdminTable(allCases) {
-            const tbody = document.getElementById('adminDetailBody');
-            tbody.innerHTML = '';
-
-            if (allCases.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
-                return;
-            }
-
-            // 顯示最近 100 筆（按時間倒序）
-            const sorted = allCases.slice().sort((a, b) => {
-                return (b.recordTime || '').localeCompare(a.recordTime || '');
-            }).slice(0, 100);
-
-            sorted.forEach(c => {
-                const tr = document.createElement('tr');
-                const status = c.endTime ? '已結束' : '進行中';
-                const statusColor = c.endTime ? 'ended' : 'active';
-                tr.innerHTML = `
-                    <td>${c.observerName || '-'}</td>
-                    <td>${c.obsIndex || '-'}</td>
-                    <td>${c.date || '-'}</td>
-                    <td>${c.period || '-'}</td>
-                    <td>${c.division || '-'}</td>
-                    <td><span class="status-tag ${statusColor}">${status}</span></td>
-                    <td>${c.action ? 1 : 0}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            if (allCases.length > 100) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="7" style="text-align:center;color:var(--neutral-gray-400);">顯示最近 100 筆，共 ${allCases.length} 筆</td>`;
-                tbody.appendChild(tr);
-            }
-        }
-
-        // ===== 修改現有函數：自動同步 =====
-
-        // 修改 executeAddEvent - 記錄動作後自動同步
-        const originalExecuteAddEvent = executeAddEvent;
-        executeAddEvent = function(actionName, note = "", isPending = false) {
-            originalExecuteAddEvent(actionName, note, isPending);
-            // 自動同步到雲端（非同步，不阻塞）
-            syncToCloud().catch(e => console.error('同步失敗:', e));
-        };
-
-        // 修改 submitCurrentObservation - 結束觀察時同步
-        const originalSubmitCurrent = submitCurrentObservation;
-        submitCurrentObservation = function() {
-            originalSubmitCurrent();
-            // 結束時強制同步
-            syncToCloud().catch(e => console.error('同步失敗:', e));
-        };
-
-        // 修改 recordLeaveAction - 離開時同步
-        const originalRecordLeave = recordLeaveAction;
-        recordLeaveAction = function(withNote) {
-            originalRecordLeave(withNote);
-            // 離開時強制同步
-            setTimeout(() => {
-                syncToCloud().catch(e => console.error('同步失敗:', e));
-            }, 100);
-        };
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyxt_ckpqSgYcCcTa4ngmVIevc8v-BkLzFKTIw0bNvPZ9lxkuHBj6_4oSos7fd0yHyqvg/exec';
 
         // ================================================================
         // 頁面切換函數
@@ -1552,11 +1328,6 @@
         function showPage(pageId) {
             document.querySelectorAll('.page-container').forEach(el => el.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-            
-            // 如果進入 Admin 頁面，自動載入數據
-            if (pageId === 'page-admin') {
-                loadAdminData();
-            }
         }
 
         function goHome() {
@@ -1611,46 +1382,239 @@
         }
 
         // ================================================================
-        // Admin 匯出功能
+        // Google Sheets 提交功能
         // ================================================================
 
-        let adminExportData = [];
-
-        async function exportAdminCSV() {
-            const cloudData = await fetchAllData();
-            const allCases = [];
-            Object.keys(cloudData).forEach(obs => {
-                (cloudData[obs].records || []).forEach(record => {
-                    allCases.push({
-                        ...record,
-                        observerName: obs
-                    });
-                });
-            });
-
-            if (allCases.length === 0) {
-                alert('沒有數據可匯出！');
+        function submitToGoogleSheets() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何觀察記錄可提交！請先完成至少一個報案人的記錄。');
                 return;
             }
 
-            const headers = ['觀察員', '報案人編號', '日期', '時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
+            const observer = document.getElementById('observerName').value || '未填寫';
+            const date = document.getElementById('obsDate').value || '未填寫';
+            const period = globalPeriod || '未選擇';
+            const division = globalDivision || '未選擇';
+            const counts = getCountValues();
+
+            const recordsToSubmit = allRecords.map(rec => ({
+                observer: observer,
+                date: date,
+                period: period,
+                division: division,
+                observerCount: counts.observerCount,
+                staffCount: counts.staffCount,
+                counterCount: counts.counterCount,
+                obsIndex: rec.obsIndex || '',
+                gender: rec.gender || '',
+                age: rec.age || '',
+                ethnicity: rec.ethnicity || '',
+                action: rec.action || '',
+                note: rec.note || '',
+                stageDuration: rec.stageDuration,
+                totalDuration: rec.totalDuration,
+                recordTime: rec.recordTime
+            }));
+
+            const btn = document.querySelector('.google-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '提交中...';
+            btn.disabled = true;
+
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(recordsToSubmit)
+            })
+            .then(() => {
+                alert('數據已提交至 Google Sheets！');
+                console.log('已提交 ' + recordsToSubmit.length + ' 筆記錄到 Google Sheets');
+            })
+            .catch(error => {
+                console.error('提交到 Google Sheets 失敗:', error);
+                alert('提交失敗，請稍後再試。若持續失敗，請改用「匯出 Excel」備份。');
+            })
+            .finally(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        // ================================================================
+        // Admin 頁面功能（從 CSV 載入數據）
+        // ================================================================
+
+        let adminData = [];
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvText = e.target.result;
+                parseCSVData(csvText);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSVData(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            if (lines.length < 2) {
+                alert('CSV 檔案格式不正確，請確保包含標頭列。');
+                return;
+            }
+
+            const headers = parseCSVLine(lines[0]);
+            const records = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values.length < headers.length) continue;
+                const record = {};
+                headers.forEach((h, idx) => {
+                    record[h] = values[idx] ? values[idx].trim() : '';
+                });
+                records.push(record);
+            }
+
+            if (records.length === 0) {
+                alert('沒有找到有效數據。');
+                return;
+            }
+
+            adminData = records;
+            renderAdminDashboard();
+            alert('成功載入 ' + adminData.length + ' 筆記錄！');
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (inQuotes) {
+                    if (char === '"' && (i + 1 < line.length && line[i + 1] === '"')) {
+                        current += '"';
+                        i++;
+                    } else if (char === '"') {
+                        inQuotes = false;
+                    } else {
+                        current += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === ',') {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        function renderAdminDashboard() {
+            const allCases = adminData;
+            const observerMap = {};
+
+            allCases.forEach(record => {
+                const observer = record.觀察者 || 'Unknown';
+                if (!observerMap[observer]) {
+                    observerMap[observer] = [];
+                }
+                observerMap[observer].push(record);
+            });
+
+            const totalCases = allCases.length;
+            const totalObservers = Object.keys(observerMap).length;
+
+            document.getElementById('totalCases').textContent = totalCases;
+            document.getElementById('totalObservers').textContent = totalObservers;
+
+            const grid = document.getElementById('adminObserverGrid');
+            grid.innerHTML = '';
+
+            const observerNames = Object.keys(observerMap);
+            if (observerNames.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無數據</div>';
+            }
+
+            observerNames.forEach(name => {
+                const cases = observerMap[name];
+                const caseCount = cases.length;
+
+                const card = document.createElement('div');
+                card.className = 'admin-observer-card';
+                card.innerHTML = `
+                    <div class="admin-observer-name">${name}</div>
+                    <div class="admin-observer-stats">
+                        <span><span class="stat-value">${caseCount}</span> <span class="stat-label">總案件</span></span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            const tbody = document.getElementById('adminDetailBody');
+            tbody.innerHTML = '';
+
+            if (allCases.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
+                return;
+            }
+
+            const displayCases = allCases.slice(0, 100);
+            displayCases.forEach(record => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${record.觀察者 || '-'}</td>
+                    <td>${record.報案人編號 || '-'}</td>
+                    <td>${record.觀察日期 || '-'}</td>
+                    <td>${record.觀察時段 || '-'}</td>
+                    <td>${record.報案室 || '-'}</td>
+                    <td><span class="status-tag ended">已提交</span></td>
+                    <td>${record.行為動作 ? 1 : 0}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (allCases.length > 100) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="7" style="text-align:center;color:var(--neutral-gray-400);">顯示最近 100 筆，共 ${allCases.length} 筆</td>`;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function exportAdminCSV() {
+            if (adminData.length === 0) {
+                alert('沒有數據可匯出！請先上傳 CSV 檔案。');
+                return;
+            }
+
+            const headers = ['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
             let csvContent = "\uFEFF" + headers.join(",") + "\n";
 
-            allCases.forEach(rec => {
+            adminData.forEach(rec => {
                 const row = [
-                    rec.observerName || '',
-                    rec.obsIndex || '',
-                    rec.date || '',
-                    rec.period || '',
-                    rec.division || '',
-                    rec.gender || '',
-                    rec.age || '',
-                    rec.ethnicity || '',
-                    rec.action || '',
-                    rec.note || '',
-                    rec.stageDuration !== undefined ? rec.stageDuration : '',
-                    rec.totalDuration !== undefined ? rec.totalDuration : '',
-                    rec.recordTime || ''
+                    rec.觀察者 || '',
+                    rec.報案人編號 || '',
+                    rec.觀察日期 || '',
+                    rec.觀察時段 || '',
+                    rec.報案室 || '',
+                    rec.性別 || '',
+                    rec.年齡層 || '',
+                    rec.族裔 || '',
+                    rec.行為動作 || '',
+                    rec.動作備註 || '',
+                    rec.階段歷時 || '',
+                    rec.總時長 || '',
+                    rec.記錄時間 || ''
                 ].map(v => `"${String(v).replace(/"/g, '""')}"`);
                 csvContent += row.join(",") + "\n";
             });
@@ -1666,39 +1630,30 @@
             URL.revokeObjectURL(url);
         }
 
-        async function exportAdminExcel() {
-            const cloudData = await fetchAllData();
-            const allCases = [];
-            Object.keys(cloudData).forEach(obs => {
-                (cloudData[obs].records || []).forEach(record => {
-                    allCases.push({
-                        ...record,
-                        observerName: obs
-                    });
-                });
-            });
-
-            if (allCases.length === 0) {
-                alert('沒有數據可匯出！');
+        function exportAdminExcel() {
+            if (adminData.length === 0) {
+                alert('沒有數據可匯出！請先上傳 CSV 檔案。');
                 return;
             }
 
-            const data = [['觀察員', '報案人編號', '日期', '時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間']];
-            allCases.forEach(rec => {
+            const data = [];
+            data.push(['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間']);
+
+            adminData.forEach(rec => {
                 data.push([
-                    rec.observerName || '',
-                    rec.obsIndex || '',
-                    rec.date || '',
-                    rec.period || '',
-                    rec.division || '',
-                    rec.gender || '',
-                    rec.age || '',
-                    rec.ethnicity || '',
-                    rec.action || '',
-                    rec.note || '',
-                    rec.stageDuration !== undefined ? rec.stageDuration : '',
-                    rec.totalDuration !== undefined ? rec.totalDuration : '',
-                    rec.recordTime || ''
+                    rec.觀察者 || '',
+                    rec.報案人編號 || '',
+                    rec.觀察日期 || '',
+                    rec.觀察時段 || '',
+                    rec.報案室 || '',
+                    rec.性別 || '',
+                    rec.年齡層 || '',
+                    rec.族裔 || '',
+                    rec.行為動作 || '',
+                    rec.動作備註 || '',
+                    rec.階段歷時 || '',
+                    rec.總時長 || '',
+                    rec.記錄時間 || ''
                 ]);
             });
 
@@ -1721,29 +1676,76 @@
             URL.revokeObjectURL(link.href);
         }
 
+        function clearAdminData() {
+            if (adminData.length === 0) return;
+            if (confirm('確定要清除所有已載入的數據嗎？')) {
+                adminData = [];
+                renderAdminDashboard();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+                uploadArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                });
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            parseCSVData(event.target.result);
+                        };
+                        reader.readAsText(files[0]);
+                    } else {
+                        alert('請上傳 CSV 檔案');
+                    }
+                });
+            }
+        });
+
         // ================================================================
-        // 行為動作清單
+        // 行為動作清單（五種顏色分組）
         // ================================================================
-        const predefinedActions = [
-            '留意到取票機',
-            '留意到自助服務機',
-            '留意到網上服務',
-            '取票機',
-            '櫃枱',
-            '自助服務機',
-            '等候區',
-            '職員諮詢/指示',
-            '櫃枱接待報案',
-            '完成自助服務機報案',
-            '完成網上服務報案'
+        // 動作與顏色分組對應
+        // group-1 (藍色) : 留意到...
+        // group-2 (綠色) : 設施類
+        // group-3 (橙色) : 諮詢類
+        // group-4 (紫色) : 接待類
+        // group-5 (青色) : 完成類
+
+        const actionGroups = [
+            { action: '留意到取票機', group: 'group-1' },
+            { action: '留意到自助服務機', group: 'group-1' },
+            { action: '留意到網上服務', group: 'group-1' },
+            { action: '取票機', group: 'group-2' },
+            { action: '櫃枱', group: 'group-2' },
+            { action: '自助服務機', group: 'group-2' },
+            { action: '等候區', group: 'group-2' },
+            { action: '職員諮詢/指示', group: 'group-3' },
+            { action: '櫃枱接待報案', group: 'group-4' },
+            { action: '完成自助服務機報案', group: 'group-5' },
+            { action: '完成網上服務報案', group: 'group-5' }
         ];
+
+        function getActionGroup(actionName) {
+            const found = actionGroups.find(item => item.action === actionName);
+            return found ? found.group : 'group-1';
+        }
 
         let globalDivision = "";
         let globalPeriod = "";
         let allRecords = [];   
         let currentObs = null; 
 
-        // ===== 自動偵測報案室 =====
         function autoDetectDivision() {
             if (!navigator.geolocation) return;
             const divisions = [
@@ -1789,7 +1791,6 @@
             );
         }
 
-        // ===== 自動選擇時段 =====
         function autoSelectPeriod() {
             const now = new Date();
             const hours = now.getHours();
@@ -1911,12 +1912,17 @@
                 `;
             }
 
-            let actionsHtml = predefinedActions.map(act => `
-                <div class="action-pair">
-                    <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
-                    <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
-                </div>
-            `).join('');
+            // 生成動作按鈕（含顏色分組）
+            let actionsHtml = actionGroups.map(item => {
+                const act = item.action;
+                const group = item.group;
+                return `
+                    <div class="action-pair ${group}">
+                        <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
+                        <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
+                    </div>
+                `;
+            }).join('');
 
             container.innerHTML = `
                 <div class="${cardClass}" data-id="${obs.id}">
@@ -2140,9 +2146,6 @@
             renderObservationCard();
             syncCurrentObsToAllRecords();
             refreshTable();
-
-            // 自動同步到雲端
-            syncToCloud().catch(e => console.error('同步失敗:', e));
         }
 
         function recordAction(actName) {
@@ -2181,10 +2184,6 @@
                 currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
                 currentObs.isRunning = false;
                 syncCurrentObsToAllRecords();
-
-                // 同步到雲端
-                syncToCloud().catch(e => console.error('同步失敗:', e));
-
                 if (currentObs.timelineEvents.some(e => e.isPending)) {
                     alert('已寫入「離開報案室」，但當前時間線中仍存在「候補時間點」未命名，請稍後在下方總表中補齊。');
                 } else {
@@ -2323,10 +2322,6 @@
             currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
             currentObs.isRunning = false;
             syncCurrentObsToAllRecords();
-
-            // 同步到雲端
-            syncToCloud().catch(e => console.error('同步失敗:', e));
-
             currentObs = createBlankObsItem();
             saveLocalStorage();
             renderObservationCard();
@@ -2574,55 +2569,6 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
-        }
-
-        function submitToNetlify() {
-            if (allRecords.length === 0) {
-                alert('目前沒有任何觀察記錄可提交！請先完成至少一個報案人的記錄。');
-                return;
-            }
-
-            const observer = document.getElementById('observerName').value || '未填寫';
-            const date = document.getElementById('obsDate').value || '未填寫';
-            const period = globalPeriod || '未選擇';
-            const division = globalDivision || '未選擇';
-            const counts = getCountValues();
-            const recordsJson = JSON.stringify(allRecords);
-
-            const form = document.createElement('form');
-            form.setAttribute('netlify', 'true');
-            form.setAttribute('name', 'observation-data');
-            form.setAttribute('method', 'POST');
-            form.setAttribute('action', '/');
-            form.style.display = 'none';
-
-            const fields = {
-                'form-name': 'observation-data',
-                'observer': observer,
-                'date': date,
-                'period': period,
-                'division': division,
-                'observer_count': counts.observerCount,
-                'staff_count': counts.staffCount,
-                'counter_count': counts.counterCount,
-                'records_data': recordsJson,
-                'total_events': allRecords.length
-            };
-
-            for (const [key, value] of Object.entries(fields)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
-            }
-
-            document.body.appendChild(form);
-            form.submit();
-
-            setTimeout(() => {
-                alert('數據已提交！請稍後回到 Netlify 後台的「Forms」頁面查看。');
-            }, 500);
         }
     </script>
 </body>
