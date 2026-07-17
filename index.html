@@ -450,7 +450,7 @@
             filter: brightness(0.9);
         }
 
-        /* 櫃枱號碼按鈕專用 (在 group-4 內) */
+        /* ===== 櫃枱數字按鈕（方形，與備註同高） ===== */
         .counter-btn-group {
             display: flex;
             align-items: center;
@@ -460,14 +460,14 @@
             background: transparent;
         }
         .counter-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 48px;
             border: 2px solid #7B1FA2;
-            border-radius: 50%;
+            border-radius: 4px;
             background: #F3E5F5;
             color: #4A148C;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             transition: var(--transition-fast);
             display: flex;
@@ -478,7 +478,7 @@
         .counter-btn:hover:not(:disabled) {
             background: #7B1FA2;
             color: #fff;
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
         .counter-btn:disabled {
             opacity: 0.4;
@@ -1127,9 +1127,9 @@
                 font-size: 20px;
             }
             .counter-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
+                width: 32px;
+                height: 42px;
+                font-size: 14px;
             }
             .action-pair {
                 min-height: 44px;
