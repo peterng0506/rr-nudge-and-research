@@ -365,11 +365,13 @@
         }
         .action-pair {
             display: flex;
+            align-items: stretch;
             border: 1px solid var(--neutral-gray-200);
             border-radius: var(--radius-sm);
             overflow: hidden;
             background: #fff;
             transition: var(--transition-fast);
+            min-height: 48px;
         }
         .action-pair:hover {
             border-color: var(--police-light-blue);
@@ -405,28 +407,73 @@
         .action-pair.group-5 .action-btn-note { background: #00838F; color: #fff; border-left-color: #4DD0E1; }
         .action-pair.group-5 .action-btn-note:hover:not(:disabled) { background: #006064; }
 
-        /* ===== 櫃枱號碼按鈕樣式 ===== */
+        /* 統一所有按鈕高度和對齊 */
+        .action-btn-main {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 600;
+            transition: var(--transition-fast);
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+        .action-btn-main:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-btn-note {
+            padding: 0 12px;
+            border: none;
+            border-left: 1px solid rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            transition: var(--transition-fast);
+            min-width: 60px;
+            min-height: 48px;
+            background: var(--neutral-gray-100);
+            color: var(--neutral-gray-800);
+        }
+        .action-btn-note:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-btn-note:hover:not(:disabled) {
+            filter: brightness(0.9);
+        }
+
+        /* 櫃枱號碼按鈕專用 (在 group-4 內) */
         .counter-btn-group {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
             padding: 0 6px;
             flex-shrink: 0;
+            background: transparent;
         }
         .counter-btn {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border: 2px solid #7B1FA2;
             border-radius: 50%;
             background: #F3E5F5;
             color: #4A148C;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
             transition: var(--transition-fast);
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
         .counter-btn:hover:not(:disabled) {
             background: #7B1FA2;
@@ -438,41 +485,6 @@
             cursor: not-allowed;
         }
 
-        .action-btn-main {
-            flex: 1;
-            padding: 10px 12px;
-            font-size: 13px;
-            border: none;
-            cursor: pointer;
-            text-align: left;
-            font-weight: 600;
-            transition: var(--transition-fast);
-        }
-        .action-btn-main:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .action-btn-note {
-            padding: 0 10px;
-            border: none;
-            border-left: 1px solid var(--neutral-gray-200);
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            transition: var(--transition-fast);
-            min-width: 50px;
-        }
-        .action-btn-note:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .action-btn-note:hover:not(:disabled) {
-            filter: brightness(0.9);
-        }
         .quick-btn {
             grid-column: 1 / -1;
             padding: 12px;
@@ -1115,12 +1127,21 @@
                 font-size: 20px;
             }
             .counter-btn {
-                width: 24px;
-                height: 24px;
-                font-size: 11px;
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
             }
-            .action-pair.group-4 {
-                flex-wrap: wrap;
+            .action-pair {
+                min-height: 44px;
+            }
+            .action-btn-main, .action-btn-note {
+                min-height: 44px;
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            .action-btn-note {
+                min-width: 50px;
+                padding: 0 8px;
             }
         }
         @media (max-width: 768px) {
@@ -1132,13 +1153,6 @@
             }
             .admin-stats-grid {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            .action-pair.group-4 {
-                flex-wrap: wrap;
-                padding-bottom: 6px;
-            }
-            .counter-btn-group {
-                padding: 4px 6px;
             }
         }
     </style>
@@ -1969,7 +1983,7 @@
                     `).join('');
                     
                     return `
-                        <div class="action-pair ${group}" style="flex-wrap: wrap; padding-right: 8px;">
+                        <div class="action-pair ${group}" style="flex-wrap: nowrap;">
                             <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
                             <div class="counter-btn-group">
                                 ${numberBtns}
