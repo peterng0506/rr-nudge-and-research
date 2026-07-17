@@ -450,7 +450,7 @@
             filter: brightness(0.9);
         }
 
-        /* ===== 櫃枱數字按鈕（方形，與備註同高） ===== */
+        /* ===== 櫃枱數字按鈕（圓形） ===== */
         .counter-btn-group {
             display: flex;
             align-items: center;
@@ -460,14 +460,14 @@
             background: transparent;
         }
         .counter-btn {
-            width: 36px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border: 2px solid #7B1FA2;
-            border-radius: 4px;
+            border-radius: 50%;
             background: #F3E5F5;
             color: #4A148C;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             transition: var(--transition-fast);
             display: flex;
@@ -478,7 +478,7 @@
         .counter-btn:hover:not(:disabled) {
             background: #7B1FA2;
             color: #fff;
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
         .counter-btn:disabled {
             opacity: 0.4;
@@ -1127,9 +1127,9 @@
                 font-size: 20px;
             }
             .counter-btn {
-                width: 32px;
-                height: 42px;
-                font-size: 14px;
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
             }
             .action-pair {
                 min-height: 44px;
@@ -1972,7 +1972,7 @@
                 const act = item.action;
                 const group = item.group;
                 
-                // 特殊處理：櫃枱接待報案 → 加上 1-5 數字按鈕
+                // 特殊處理：櫃枱接待報案 → 加上 1-5 數字按鈕（圓形）
                 if (act === '櫃枱接待報案') {
                     const numberBtns = [1, 2, 3, 4, 5].map(num => `
                         <button class="counter-btn" ${!obs.isRunning ? 'disabled' : ''} 
