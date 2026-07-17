@@ -2002,13 +2002,7 @@
                 `;
             }).join('');
 
-            // 離開報案室按鈕（紅色）
-            actionsHtml += `
-                <div class="action-pair" style="border: 1px solid var(--warning-red); background: var(--danger-bg);">
-                    <button class="action-btn-main" style="background: var(--danger-bg); color: var(--warning-red); font-weight: 700;" ${!obs.isRunning ? 'disabled' : ''} onclick="recordLeaveAction(false)">離開報案室</button>
-                    <button class="action-btn-note" style="background: var(--warning-red); color: white;" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordLeaveAction(true)">備註</button>
-                </div>
-            `;
+            // 注意：已移除「離開報案室」按鈕
 
             container.innerHTML = `
                 <div class="${cardClass}" data-id="${obs.id}">
@@ -2247,51 +2241,6 @@
                     executeAddEvent(actName, noteVal, false);
                 }
             });
-        }
-
-        function recordLeaveAction(withNote) {
-            if (!currentObs.isRunning) return;
-            const proceedLeaveWorkflow = (noteVal = "") => {
-                let lastTime = 0;
-                if (currentObs.timelineEvents.length > 0) {
-                    lastTime = currentObs.timelineEvents[currentObs.timelineEvents.length - 1].timestamp;
-                }
-                const stageDur = currentObs.elapsedSeconds - lastTime;
-                const leaveEvent = {
-                    uuid: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-                    timestamp: currentObs.elapsedSeconds,
-                    action: '離開報案室',
-                    note: noteVal || '點選自動結案',
-                    stageDuration: stageDur,
-                    isPending: false,
-                    recordTime: new Date().toLocaleTimeString('zh-HK', { hour12: false })
-                };
-                currentObs.timelineEvents.push(leaveEvent);
-                currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
-                currentObs.isRunning = false;
-                syncCurrentObsToAllRecords();
-                if (currentObs.timelineEvents.some(e => e.isPending)) {
-                    alert('已寫入「離開報案室」，但當前時間線中仍存在「候補時間點」未命名，請稍後在下方總表中補齊。');
-                } else {
-                    alert('報案人已離開！數據已成功鎖定存檔，系統已自動生成下一個全新的隨機個案。');
-                }
-                currentObs = createBlankObsItem();
-                saveLocalStorage();
-                renderObservationCard();
-                refreshTable();
-            };
-            if (withNote) {
-                openCustomModal({
-                    title: `為「離開報案室」加入終端備註`,
-                    placeholder: "請輸入離開時的狀態描述...",
-                    showSkip: true,
-                    onSave: (noteVal) => { proceedLeaveWorkflow(noteVal); }
-                });
-            } else {
-                if (confirm('確認記錄「離開報案室」並立刻結案封存當前個案嗎？')) {
-                    proceedLeaveWorkflow("");
-                }
-            }
         }
 
         function quickMark() {
