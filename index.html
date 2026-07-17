@@ -1368,7 +1368,7 @@
             <div class="table-btn-group">
                 <button class="export-btn" onclick="exportCSV()">匯出全部CSV數據</button>
                 <button class="excel-btn" onclick="exportExcel()">匯出為 Excel 報告</button>
-                <button class="google-btn" onclick="submitToGoogleSheets()">提交至 Google Sheets</button>
+                <button class="google-btn" onclick="submitToGoogleSheets()">手動提交至 Google Sheets</button>
                 <button class="clear-btn" onclick="clearAllRecords()">清空全部記錄</button>
             </div>
         </div>
@@ -1379,9 +1379,118 @@
     <!-- ============================================================ -->
     <script>
         // ================================================================
-        // Google Sheets 設定（已更新為您最新部署的網址）
+        // Google Sheets 設定
         // ================================================================
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzIiEkr0yLeugZKkTe9f-6Ph7_R94lHaxnbyFhTLCuYIQ1n9VhfH_gWOiZteh5cdVlD-w/exec';
+
+        // ================================================================
+        // 自動同步函數（每次記錄動作時自動觸發）
+        // ================================================================
+
+        // 防抖：避免短時間內頻繁發送
+        let syncTimeout = null;
+        let syncQueue = [];
+
+        function autoSyncToSheets(immediate = false) {
+            if (allRecords.length === 0) return;
+
+            // 立即同步（用於結束觀察時）
+            if (immediate) {
+                sendToGoogleSheets(allRecords);
+                return;
+            }
+
+            // 延遲同步（累積 2 秒內的動作，合併發送）
+            syncQueue = allRecords.slice();
+
+            if (syncTimeout) {
+                clearTimeout(syncTimeout);
+            }
+
+            syncTimeout = setTimeout(() => {
+                if (syncQueue.length > 0) {
+                    sendToGoogleSheets(syncQueue);
+                    syncQueue = [];
+                }
+                syncTimeout = null;
+            }, 2000);
+        }
+
+        function sendToGoogleSheets(records) {
+            const observer = document.getElementById('observerName').value || '未填寫';
+            const date = document.getElementById('obsDate').value || '未填寫';
+            const period = globalPeriod || '未選擇';
+            const division = globalDivision || '未選擇';
+            const counts = getCountValues();
+
+            const recordsToSubmit = records.map(rec => ({
+                observer: observer,
+                date: date,
+                period: period,
+                division: division,
+                observerCount: counts.observerCount,
+                staffCount: counts.staffCount,
+                counterCount: counts.counterCount,
+                obsIndex: rec.obsIndex || '',
+                gender: rec.gender || '',
+                age: rec.age || '',
+                ethnicity: rec.ethnicity || '',
+                action: rec.action || '',
+                note: rec.note || '',
+                stageDuration: rec.stageDuration,
+                totalDuration: rec.totalDuration,
+                recordTime: rec.recordTime
+            }));
+
+            // 背景發送，不阻塞使用者操作
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(recordsToSubmit)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(result => {
+                if (result.success) {
+                    console.log('✅ 自動同步成功，共 ' + result.count + ' 筆記錄');
+                } else {
+                    console.warn('⚠️ 同步失敗:', result.error);
+                }
+            })
+            .catch(error => {
+                console.error('❌ 自動同步錯誤:', error);
+            });
+        }
+
+        // ================================================================
+        // 手動提交（保留作為備份）
+        // ================================================================
+
+        function submitToGoogleSheets() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何觀察記錄可提交！請先完成至少一個報案人的記錄。');
+                return;
+            }
+
+            const btn = document.querySelector('.google-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '提交中...';
+            btn.disabled = true;
+
+            sendToGoogleSheets(allRecords);
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                alert('數據已提交至 Google Sheets！');
+            }, 1000);
+        }
 
         // ================================================================
         // 頁面切換函數
@@ -1440,68 +1549,6 @@
             document.getElementById('observerName').value = name;
             localStorage.setItem('selectedObserver', name);
             setTimeout(goToObserver, 400);
-        }
-
-        // ================================================================
-        // Google Sheets 提交功能
-        // ================================================================
-
-        function submitToGoogleSheets() {
-            if (allRecords.length === 0) {
-                alert('目前沒有任何觀察記錄可提交！請先完成至少一個報案人的記錄。');
-                return;
-            }
-
-            const observer = document.getElementById('observerName').value || '未填寫';
-            const date = document.getElementById('obsDate').value || '未填寫';
-            const period = globalPeriod || '未選擇';
-            const division = globalDivision || '未選擇';
-            const counts = getCountValues();
-
-            const recordsToSubmit = allRecords.map(rec => ({
-                observer: observer,
-                date: date,
-                period: period,
-                division: division,
-                observerCount: counts.observerCount,
-                staffCount: counts.staffCount,
-                counterCount: counts.counterCount,
-                obsIndex: rec.obsIndex || '',
-                gender: rec.gender || '',
-                age: rec.age || '',
-                ethnicity: rec.ethnicity || '',
-                action: rec.action || '',
-                note: rec.note || '',
-                stageDuration: rec.stageDuration,
-                totalDuration: rec.totalDuration,
-                recordTime: rec.recordTime
-            }));
-
-            const btn = document.querySelector('.google-btn');
-            const originalText = btn.textContent;
-            btn.textContent = '提交中...';
-            btn.disabled = true;
-
-            fetch(GOOGLE_SHEETS_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(recordsToSubmit)
-            })
-            .then(() => {
-                alert('數據已提交至 Google Sheets！');
-                console.log('已提交 ' + recordsToSubmit.length + ' 筆記錄到 Google Sheets');
-            })
-            .catch(error => {
-                console.error('提交到 Google Sheets 失敗:', error);
-                alert('提交失敗，請稍後再試。若持續失敗，請改用「匯出 Excel」備份。');
-            })
-            .finally(() => {
-                btn.textContent = originalText;
-                btn.disabled = false;
-            });
         }
 
         // ================================================================
@@ -2225,6 +2272,9 @@
             renderObservationCard();
             syncCurrentObsToAllRecords();
             refreshTable();
+
+            // ===== 自動同步到 Google Sheets =====
+            autoSyncToSheets(false);
         }
 
         function recordAction(actName) {
@@ -2356,6 +2406,10 @@
             currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
             currentObs.isRunning = false;
             syncCurrentObsToAllRecords();
+
+            // ===== 結束觀察時立即同步 =====
+            autoSyncToSheets(true);
+
             currentObs = createBlankObsItem();
             saveLocalStorage();
             renderObservationCard();
