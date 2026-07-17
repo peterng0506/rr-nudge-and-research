@@ -27,7 +27,8 @@
             --radius-md: 12px;
             --transition-fast: all 0.2s ease-in-out;
             --google-blue: #4285F4;
-            --download-green: #2E7D32;
+            --upload-green: #2E7D32;
+            --clear-red: #C62828;
         }
         * { box-sizing: border-box; }
         body {
@@ -610,9 +611,9 @@
             gap: 12px;
             margin-top: 16px;
         }
-        .export-btn, .clear-btn, .excel-btn, .google-btn, .download-btn {
+        .upload-btn, .clear-btn {
             flex: 1;
-            min-width: 150px;
+            min-width: 180px;
             padding: 12px;
             font-size: 15px;
             font-weight: 600;
@@ -622,16 +623,20 @@
             transition: var(--transition-fast);
             text-align: center;
         }
-        .export-btn { background-color: var(--neutral-gray-800); color: white; }
-        .clear-btn { background-color: #64748B; color: white; }
-        .excel-btn { background-color: #1e6f3f; color: white; }
-        .google-btn { background-color: var(--google-blue); color: white; }
-        .download-btn { background-color: var(--download-green); color: white; }
-        .export-btn:hover { background-color: #0F172A; }
-        .clear-btn:hover { background-color: #475569; }
-        .excel-btn:hover { background-color: #14532d; }
-        .google-btn:hover { background-color: #3367D6; }
-        .download-btn:hover { background-color: #1B5E20; }
+        .upload-btn {
+            background-color: var(--upload-green);
+            color: white;
+        }
+        .upload-btn:hover {
+            background-color: #1B5E20;
+        }
+        .clear-btn {
+            background-color: var(--clear-red);
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #B71C1C;
+        }
         .modal-mask {
             position: fixed;
             inset: 0;
@@ -1308,10 +1313,8 @@
                 </table>
             </div>
             <div class="table-btn-group">
-                <button class="export-btn" onclick="exportCSV()">匯出全部CSV數據</button>
-                <button class="excel-btn" onclick="exportExcel()">匯出為 Excel 報告</button>
-                <button class="google-btn" onclick="manualSyncToSheets()">手動同步</button>
-                <button class="download-btn" onclick="downloadAndClear()">下載CSV及Excel報告</button>
+                <button class="upload-btn" onclick="uploadToCloud()">☁️ 上傳至雲端</button>
+                <button class="clear-btn" onclick="clearAllRecordsWithDownload()">🗑️ 清空全部記錄</button>
             </div>
         </div>
     </div>
@@ -1326,10 +1329,10 @@
         // 即時同步網址（原有試算表）
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzIiEkr0yLeugZKkTe9f-6Ph7_R94lHaxnbyFhTLCuYIQ1n9VhfH_gWOiZteh5cdVlD-w/exec';
         // 個人報告網址（Personal Record Report - Admin）
-        const PERSONAL_REPORT_URL = 'https://script.google.com/macros/s/AKfycbwwOG3gfi8BqC9h09-TAs1eyScqB_B81_XozqwVOiIN4KHhKxhV4xhSg3ZDSrg4EbDCpw/exec';
+        const PERSONAL_REPORT_URL = 'https://script.google.com/macros/s/你的個人報告網址/exec';
 
         // ================================================================
-        // 自動同步函數
+        // 自動同步函數（每次記錄動作時自動觸發）
         // ================================================================
         let syncTimeout = null;
         let syncQueue = [];
@@ -1380,83 +1383,88 @@
         }
 
         // ================================================================
-        // 個人報告上傳
+        // 上傳至雲端（手動觸發，上傳到主試算表 + 個人報告）
         // ================================================================
-        function uploadPersonalReport(records) {
-            if (PERSONAL_REPORT_URL.includes('你的個人報告網址')) {
-                console.warn('⚠️ 個人報告網址尚未設定');
+        function uploadToCloud() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何記錄可以上傳！');
                 return;
             }
 
+            const btn = document.querySelector('.upload-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '上傳中...';
+            btn.disabled = true;
+
+            // 1. 上傳到主試算表
+            sendToGoogleSheets(allRecords);
+
+            // 2. 上傳個人報告
             const observer = document.getElementById('observerName').value || '未填寫';
             const date = document.getElementById('obsDate').value || '未填寫';
             const period = globalPeriod || '未選擇';
             const division = globalDivision || '未選擇';
             const counts = getCountValues();
 
-            const endedRecords = records.filter(rec => rec.endTime);
-            if (endedRecords.length === 0) return;
+            const endedRecords = allRecords.filter(rec => rec.endTime);
+            if (endedRecords.length > 0 && !PERSONAL_REPORT_URL.includes('你的個人報告網址')) {
+                const recordsToSubmit = endedRecords.map(rec => ({
+                    observer: observer, date: date, period: period, division: division,
+                    observerCount: counts.observerCount, staffCount: counts.staffCount,
+                    counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
+                    gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
+                    action: rec.action || '', note: rec.note || '',
+                    stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
+                    recordTime: rec.recordTime
+                }));
 
-            const recordsToSubmit = endedRecords.map(rec => ({
-                observer: observer, date: date, period: period, division: division,
-                observerCount: counts.observerCount, staffCount: counts.staffCount,
-                counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
-                gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
-                action: rec.action || '', note: rec.note || '',
-                stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
-                recordTime: rec.recordTime
-            }));
-
-            fetch(PERSONAL_REPORT_URL, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(recordsToSubmit)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) console.log('✅ 個人報告上傳成功，共 ' + result.count + ' 筆');
-            })
-            .catch(error => console.error('❌ 個人報告上傳錯誤:', error));
-        }
-
-        // ================================================================
-        // 手動同步
-        // ================================================================
-        function manualSyncToSheets() {
-            if (allRecords.length === 0) {
-                alert('目前沒有任何觀察記錄可提交！');
-                return;
+                fetch(PERSONAL_REPORT_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(recordsToSubmit)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) console.log('✅ 個人報告上傳成功，共 ' + result.count + ' 筆');
+                })
+                .catch(error => console.error('❌ 個人報告上傳錯誤:', error));
             }
-            const btn = document.querySelector('.google-btn');
-            const originalText = btn.textContent;
-            btn.textContent = '同步中...';
-            btn.disabled = true;
-            sendToGoogleSheets(allRecords);
+
             setTimeout(() => {
                 btn.textContent = originalText;
                 btn.disabled = false;
-                alert('數據已同步至 Google Sheets！');
-            }, 1000);
+                alert('✅ 數據已成功上傳至雲端！');
+            }, 1500);
         }
 
         // ================================================================
-        // 下載 CSV + Excel 並清空記錄
+        // 清空全部記錄（下載 CSV + Excel，然後清空）
         // ================================================================
-        function downloadAndClear() {
+        function clearAllRecordsWithDownload() {
             if (allRecords.length === 0) {
-                alert('目前沒有任何記錄可下載！');
+                alert('目前沒有任何記錄可下載或清空！');
                 return;
             }
+
+            if (!confirm('⚠️ 確定要下載並清空所有記錄嗎？\n\n此操作將：\n1. 下載 CSV 檔案\n2. 下載 Excel 報告\n3. 清空所有本地記錄\n\n此操作無法復原！')) {
+                return;
+            }
+
+            // 1. 匯出 CSV
             exportCSV();
-            setTimeout(() => { exportExcel(); }, 500);
+
+            // 2. 匯出 Excel（延遲確保下載完成）
             setTimeout(() => {
-                if (confirm('數據已下載，是否清空當前所有記錄？')) {
-                    allRecords = [];
-                    currentObs = createBlankObsItem();
-                    saveLocalStorage();
-                    renderObservationCard();
-                    refreshTable();
-                    alert('所有記錄已清空！');
-                }
+                exportExcel();
+            }, 500);
+
+            // 3. 清空所有記錄
+            setTimeout(() => {
+                allRecords = [];
+                currentObs = createBlankObsItem();
+                saveLocalStorage();
+                renderObservationCard();
+                refreshTable();
+                alert('✅ 所有記錄已清空！');
             }, 1500);
         }
 
@@ -2264,6 +2272,7 @@
             });
         }
 
+        // ===== 修改：結束觀察只負責結束，不上傳 =====
         function submitCurrentObservation() {
             if (!currentObs || currentObs.timelineEvents.length === 0) {
                 alert('當前個案未有任何行為動作記錄，無法提交！');
@@ -2273,20 +2282,19 @@
                 alert('請先補齊所有「候補時間點」的動作名稱再進行結案提交！');
                 return;
             }
-            if (!confirm('確認手動強制結束並儲存當前個案嗎？')) return;
+            if (!confirm('確認結束當前觀察，開始下一個案件嗎？')) return;
 
+            // 只記錄結束時間，不上傳任何數據
             currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
             currentObs.isRunning = false;
             syncCurrentObsToAllRecords();
 
-            // 上傳個人報告
-            uploadPersonalReport(allRecords);
-
+            // 產生新個案
             currentObs = createBlankObsItem();
             saveLocalStorage();
             renderObservationCard();
             refreshTable();
-            alert('個案觀察已成功儲存並封存！');
+            alert('✅ 已結束觀察，開始下一個案件！');
         }
 
         function refreshTable() {
@@ -2408,17 +2416,6 @@
             allRecords = JSON.parse(localStorage.getItem('allRecords')) || [];
             if (localStorage.getItem('currentObs')) {
                 currentObs = JSON.parse(localStorage.getItem('currentObs'));
-            }
-        }
-
-        function clearAllRecords() {
-            if (confirm('警告：這將會清空數據庫中「全部」已記錄的報案人行為歷史，且無法還原！\n確認清空？')) {
-                allRecords = [];
-                currentObs = createBlankObsItem();
-                saveLocalStorage();
-                renderObservationCard();
-                refreshTable();
-                alert('所有歷史記錄已全部清空。');
             }
         }
 
