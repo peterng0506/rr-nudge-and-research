@@ -27,6 +27,7 @@
             --radius-md: 12px;
             --transition-fast: all 0.2s ease-in-out;
             --google-blue: #4285F4;
+            --download-green: #2E7D32;
         }
         * { box-sizing: border-box; }
         body {
@@ -49,12 +50,6 @@
         h4 {
             margin: 16px 0 8px;
             font-size: 15px;
-            font-weight: 600;
-            color: var(--neutral-gray-800);
-        }
-        h5 {
-            margin: 12px 0 6px;
-            font-size: 14px;
             font-weight: 600;
             color: var(--neutral-gray-800);
         }
@@ -263,8 +258,6 @@
         }
         .btn-start { background: var(--success-green); color: #fff; }
         .btn-reset { background: #64748B; color: #fff; }
-        .btn-danger { background: var(--warning-red); color: #fff; }
-        .btn-danger:hover { background: #B71C1C; }
         .col-timeline-section {
             margin-bottom: 20px;
             padding-bottom: 16px;
@@ -376,38 +369,32 @@
         .action-pair:hover {
             border-color: var(--police-light-blue);
         }
-        /* ===== 動作按鈕五種顏色 ===== */
         .action-pair.group-1 { background: #E3F2FD; border-color: #64B5F6; }
         .action-pair.group-1 .action-btn-main { background: #E3F2FD; color: #0D47A1; }
         .action-pair.group-1 .action-btn-main:hover:not(:disabled) { background: #BBDEFB; }
         .action-pair.group-1 .action-btn-note { background: #1976D2; color: #fff; border-left-color: #64B5F6; }
         .action-pair.group-1 .action-btn-note:hover:not(:disabled) { background: #0D47A1; }
-
         .action-pair.group-2 { background: #E8F5E9; border-color: #81C784; }
         .action-pair.group-2 .action-btn-main { background: #E8F5E9; color: #1B5E20; }
         .action-pair.group-2 .action-btn-main:hover:not(:disabled) { background: #C8E6C9; }
         .action-pair.group-2 .action-btn-note { background: #388E3C; color: #fff; border-left-color: #81C784; }
         .action-pair.group-2 .action-btn-note:hover:not(:disabled) { background: #1B5E20; }
-
         .action-pair.group-3 { background: #FFF3E0; border-color: #FFB74D; }
         .action-pair.group-3 .action-btn-main { background: #FFF3E0; color: #E65100; }
         .action-pair.group-3 .action-btn-main:hover:not(:disabled) { background: #FFE0B2; }
         .action-pair.group-3 .action-btn-note { background: #F57C00; color: #fff; border-left-color: #FFB74D; }
         .action-pair.group-3 .action-btn-note:hover:not(:disabled) { background: #E65100; }
-
         .action-pair.group-4 { background: #F3E5F5; border-color: #BA68C8; }
         .action-pair.group-4 .action-btn-main { background: #F3E5F5; color: #4A148C; }
         .action-pair.group-4 .action-btn-main:hover:not(:disabled) { background: #E1BEE7; }
         .action-pair.group-4 .action-btn-note { background: #7B1FA2; color: #fff; border-left-color: #BA68C8; }
         .action-pair.group-4 .action-btn-note:hover:not(:disabled) { background: #4A148C; }
-
         .action-pair.group-5 { background: #E0F7FA; border-color: #4DD0E1; }
         .action-pair.group-5 .action-btn-main { background: #E0F7FA; color: #006064; }
         .action-pair.group-5 .action-btn-main:hover:not(:disabled) { background: #B2EBF2; }
         .action-pair.group-5 .action-btn-note { background: #00838F; color: #fff; border-left-color: #4DD0E1; }
         .action-pair.group-5 .action-btn-note:hover:not(:disabled) { background: #006064; }
 
-        /* 統一所有按鈕高度和對齊 */
         .action-btn-main {
             flex: 1;
             padding: 8px 12px;
@@ -450,7 +437,6 @@
             filter: brightness(0.9);
         }
 
-        /* ===== 櫃枱數字按鈕（圓形） ===== */
         .counter-btn-group {
             display: flex;
             align-items: center;
@@ -624,7 +610,7 @@
             gap: 12px;
             margin-top: 16px;
         }
-        .export-btn, .clear-btn, .excel-btn, .google-btn {
+        .export-btn, .clear-btn, .excel-btn, .google-btn, .download-btn {
             flex: 1;
             min-width: 150px;
             padding: 12px;
@@ -640,10 +626,12 @@
         .clear-btn { background-color: #64748B; color: white; }
         .excel-btn { background-color: #1e6f3f; color: white; }
         .google-btn { background-color: var(--google-blue); color: white; }
+        .download-btn { background-color: var(--download-green); color: white; }
         .export-btn:hover { background-color: #0F172A; }
         .clear-btn:hover { background-color: #475569; }
         .excel-btn:hover { background-color: #14532d; }
         .google-btn:hover { background-color: #3367D6; }
+        .download-btn:hover { background-color: #1B5E20; }
         .modal-mask {
             position: fixed;
             inset: 0;
@@ -739,7 +727,6 @@
             display: block;
         }
 
-        /* ===== 首頁 ===== */
         .home-wrapper {
             background: #fff;
             border-radius: var(--radius-md);
@@ -797,7 +784,6 @@
             background-color: #475569;
         }
 
-        /* ===== 選擇觀察員頁面 ===== */
         .select-observer-wrapper {
             background: #fff;
             border-radius: var(--radius-md);
@@ -878,7 +864,6 @@
             background-color: #475569;
         }
 
-        /* ===== Admin 頁面 ===== */
         .admin-wrapper {
             background: #fff;
             border-radius: var(--radius-md);
@@ -897,6 +882,40 @@
             font-size: 14px;
             color: var(--neutral-gray-400);
             margin-bottom: 20px;
+        }
+        .admin-upload-area {
+            border: 2px dashed var(--neutral-gray-300);
+            border-radius: var(--radius-sm);
+            padding: 30px 20px;
+            text-align: center;
+            margin: 16px 0 24px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            background: var(--neutral-gray-50);
+        }
+        .admin-upload-area:hover {
+            border-color: var(--police-light-blue);
+            background: #fff;
+        }
+        .admin-upload-area.dragover {
+            border-color: var(--success-green);
+            background: var(--success-bg);
+        }
+        .admin-upload-area .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        .admin-upload-area .text {
+            font-size: 14px;
+            color: var(--neutral-gray-400);
+        }
+        .admin-upload-area .text strong {
+            color: var(--police-blue);
+        }
+        .admin-upload-area .sub-text {
+            font-size: 12px;
+            color: var(--neutral-gray-300);
+            margin-top: 4px;
         }
         .admin-stats-grid {
             display: grid;
@@ -1003,42 +1022,6 @@
             background: #E0E7FF;
             color: #3730A3;
         }
-
-        .admin-upload-area {
-            border: 2px dashed var(--neutral-gray-300);
-            border-radius: var(--radius-sm);
-            padding: 30px 20px;
-            text-align: center;
-            margin: 16px 0 24px;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            background: var(--neutral-gray-50);
-        }
-        .admin-upload-area:hover {
-            border-color: var(--police-light-blue);
-            background: #fff;
-        }
-        .admin-upload-area.dragover {
-            border-color: var(--success-green);
-            background: var(--success-bg);
-        }
-        .admin-upload-area .icon {
-            font-size: 40px;
-            margin-bottom: 8px;
-        }
-        .admin-upload-area .text {
-            font-size: 14px;
-            color: var(--neutral-gray-400);
-        }
-        .admin-upload-area .text strong {
-            color: var(--police-blue);
-        }
-        .admin-upload-area .sub-text {
-            font-size: 12px;
-            color: var(--neutral-gray-300);
-            margin-top: 4px;
-        }
-
         .admin-table-wrap {
             overflow-x: auto;
             margin-top: 16px;
@@ -1066,14 +1049,12 @@
         .admin-table-wrap tbody tr:hover {
             background-color: rgba(0, 56, 168, 0.04);
         }
-
         .admin-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             margin-top: 16px;
         }
-
         .back-btn {
             background-color: #64748B;
             color: #fff;
@@ -1087,7 +1068,6 @@
         .back-btn:hover {
             background-color: #475569;
         }
-
         .last-updated {
             font-size: 12px;
             color: var(--neutral-gray-400);
@@ -1143,6 +1123,12 @@
                 min-width: 50px;
                 padding: 0 8px;
             }
+            .table-btn-group {
+                flex-direction: column;
+            }
+            .table-btn-group button {
+                width: 100%;
+            }
         }
         @media (max-width: 768px) {
             .home-wrapper, .select-observer-wrapper, .admin-wrapper {
@@ -1159,9 +1145,7 @@
 </head>
 <body>
 
-    <!-- ============================================================ -->
-    <!-- 首頁 -->
-    <!-- ============================================================ -->
+    <!-- ===== 首頁 ===== -->
     <div id="page-home" class="page-container active">
         <div class="privacy-banner">
             保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
@@ -1176,9 +1160,7 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- 選擇觀察員頁面 -->
-    <!-- ============================================================ -->
+    <!-- ===== 選擇觀察員頁面 ===== -->
     <div id="page-select-observer" class="page-container">
         <div class="privacy-banner">
             保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
@@ -1186,7 +1168,6 @@
         <div class="select-observer-wrapper">
             <div class="select-observer-title">選擇觀察員</div>
             <div class="select-observer-subtitle">請選擇您的身份，系統將自動帶入觀察者姓名</div>
-
             <div class="observer-options">
                 <button class="observer-option-btn" onclick="selectObserver('Churchill')">Churchill</button>
                 <button class="observer-option-btn" onclick="selectObserver('Siu Wai')">Siu Wai</button>
@@ -1194,80 +1175,45 @@
                 <button class="observer-option-btn" onclick="selectObserver('Peter')">Peter</button>
                 <button class="observer-option-btn other-btn" onclick="selectObserver('Other')">Other</button>
             </div>
-
             <div class="selected-display" id="selectedDisplay"></div>
-
             <button class="select-observer-back" onclick="goHome()">返回首頁</button>
         </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- Admin 頁面 -->
-    <!-- ============================================================ -->
+    <!-- ===== Admin 頁面 ===== -->
     <div id="page-admin" class="page-container">
         <div class="privacy-banner">
             保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
         </div>
-
         <div style="margin-bottom: 16px; text-align: right;">
             <button class="back-btn" onclick="goHome()">返回首頁</button>
         </div>
-
         <div class="admin-wrapper">
             <div class="admin-title">管理員儀表板</div>
             <div class="admin-subtitle">觀察員填寫進度總覽</div>
-
             <div class="admin-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                 <div class="icon">📤</div>
                 <div class="text">拖曳 <strong>CSV 檔案</strong> 到這裡，或點擊上傳</div>
                 <div class="sub-text">支援從 Google Sheets 下載的 CSV 檔案</div>
                 <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleFileUpload(event)">
             </div>
-
             <div class="admin-stats-grid" id="adminStatsGrid">
-                <div class="admin-stat-card">
-                    <div class="admin-stat-number" id="totalCases">0</div>
-                    <div class="admin-stat-label">總案件數</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="admin-stat-number" id="totalObservers">0</div>
-                    <div class="admin-stat-label">觀察員人數</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="admin-stat-number" id="totalSubmitted">0</div>
-                    <div class="admin-stat-label">已提交案件</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="admin-stat-number" id="totalActive">0</div>
-                    <div class="admin-stat-label">進行中案件</div>
-                </div>
+                <div class="admin-stat-card"><div class="admin-stat-number" id="totalCases">0</div><div class="admin-stat-label">總案件數</div></div>
+                <div class="admin-stat-card"><div class="admin-stat-number" id="totalObservers">0</div><div class="admin-stat-label">觀察員人數</div></div>
+                <div class="admin-stat-card"><div class="admin-stat-number" id="totalSubmitted">0</div><div class="admin-stat-label">已提交案件</div></div>
+                <div class="admin-stat-card"><div class="admin-stat-number" id="totalActive">0</div><div class="admin-stat-label">進行中案件</div></div>
             </div>
-
             <h4 style="margin-bottom:12px;">觀察員進度</h4>
             <div class="admin-observer-grid" id="adminObserverGrid">
                 <div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">請上傳 CSV 檔案以查看數據</div>
             </div>
-
             <h4 style="margin-bottom:12px;">所有案件明細</h4>
             <div class="admin-table-wrap">
                 <table id="adminDetailTable">
-                    <thead>
-                        <tr>
-                            <th>觀察員</th>
-                            <th>報案人編號</th>
-                            <th>日期</th>
-                            <th>時段</th>
-                            <th>報案室</th>
-                            <th>狀態</th>
-                            <th>動作數</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminDetailBody">
-                        <tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">請上傳 CSV 檔案以查看數據</td></tr>
-                    </tbody>
+                    <thead><tr><th>觀察員</th><th>報案人編號</th><th>日期</th><th>時段</th><th>報案室</th><th>狀態</th><th>動作數</th></tr></thead>
+                    <tbody id="adminDetailBody"><tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">請上傳 CSV 檔案以查看數據</td></tr></tbody>
                 </table>
             </div>
-
             <div class="admin-actions">
                 <button class="admin-btn" onclick="exportAdminCSV()">匯出全部數據 (CSV)</button>
                 <button class="excel-btn" onclick="exportAdminExcel()">匯出 Excel 報告</button>
@@ -1276,18 +1222,14 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- 觀察頁 -->
-    <!-- ============================================================ -->
+    <!-- ===== 觀察頁 ===== -->
     <div id="page-observer" class="page-container">
         <div class="privacy-banner">
             保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
         </div>
-
         <div style="margin-bottom: 16px; text-align: right;">
             <button class="ctrl-btn btn-reset" onclick="goHome()" style="background: #64748B; color: #fff;">返回首頁</button>
         </div>
-
         <div class="global-info-panel">
             <h3>觀察基礎資訊 <span class="tip-text">（帶*為必填）</span></h3>
             <div class="global-row">
@@ -1368,8 +1310,8 @@
             <div class="table-btn-group">
                 <button class="export-btn" onclick="exportCSV()">匯出全部CSV數據</button>
                 <button class="excel-btn" onclick="exportExcel()">匯出為 Excel 報告</button>
-                <button class="google-btn" onclick="submitToGoogleSheets()">手動提交至 Google Sheets</button>
-                <button class="clear-btn" onclick="clearAllRecords()">清空全部記錄</button>
+                <button class="google-btn" onclick="manualSyncToSheets()">手動同步</button>
+                <button class="download-btn" onclick="downloadAndClear()">下載CSV及Excel報告</button>
             </div>
         </div>
     </div>
@@ -1379,34 +1321,27 @@
     <!-- ============================================================ -->
     <script>
         // ================================================================
-        // Google Sheets 設定
+        // Google Sheets 設定（請填入您的網址）
         // ================================================================
+        // 即時同步網址（原有試算表）
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzIiEkr0yLeugZKkTe9f-6Ph7_R94lHaxnbyFhTLCuYIQ1n9VhfH_gWOiZteh5cdVlD-w/exec';
+        // 個人報告網址（Personal Record Report - Admin）
+        const PERSONAL_REPORT_URL = 'https://script.google.com/macros/s/你的個人報告網址/exec';
 
         // ================================================================
-        // 自動同步函數（每次記錄動作時自動觸發）
+        // 自動同步函數
         // ================================================================
-
-        // 防抖：避免短時間內頻繁發送
         let syncTimeout = null;
         let syncQueue = [];
 
         function autoSyncToSheets(immediate = false) {
             if (allRecords.length === 0) return;
-
-            // 立即同步（用於結束觀察時）
             if (immediate) {
                 sendToGoogleSheets(allRecords);
                 return;
             }
-
-            // 延遲同步（累積 2 秒內的動作，合併發送）
             syncQueue = allRecords.slice();
-
-            if (syncTimeout) {
-                clearTimeout(syncTimeout);
-            }
-
+            if (syncTimeout) clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
                 if (syncQueue.length > 0) {
                     sendToGoogleSheets(syncQueue);
@@ -1424,96 +1359,121 @@
             const counts = getCountValues();
 
             const recordsToSubmit = records.map(rec => ({
-                observer: observer,
-                date: date,
-                period: period,
-                division: division,
-                observerCount: counts.observerCount,
-                staffCount: counts.staffCount,
-                counterCount: counts.counterCount,
-                obsIndex: rec.obsIndex || '',
-                gender: rec.gender || '',
-                age: rec.age || '',
-                ethnicity: rec.ethnicity || '',
-                action: rec.action || '',
-                note: rec.note || '',
-                stageDuration: rec.stageDuration,
-                totalDuration: rec.totalDuration,
+                observer: observer, date: date, period: period, division: division,
+                observerCount: counts.observerCount, staffCount: counts.staffCount,
+                counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
+                gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
+                action: rec.action || '', note: rec.note || '',
+                stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
                 recordTime: rec.recordTime
             }));
 
-            // 背景發送，不阻塞使用者操作
             fetch(GOOGLE_SHEETS_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(recordsToSubmit)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(result => {
-                if (result.success) {
-                    console.log('✅ 自動同步成功，共 ' + result.count + ' 筆記錄');
-                } else {
-                    console.warn('⚠️ 同步失敗:', result.error);
-                }
+                if (result.success) console.log('✅ 同步成功，共 ' + result.count + ' 筆');
             })
-            .catch(error => {
-                console.error('❌ 自動同步錯誤:', error);
-            });
+            .catch(error => console.error('❌ 同步錯誤:', error));
         }
 
         // ================================================================
-        // 手動提交（保留作為備份）
+        // 個人報告上傳
         // ================================================================
-
-        function submitToGoogleSheets() {
-            if (allRecords.length === 0) {
-                alert('目前沒有任何觀察記錄可提交！請先完成至少一個報案人的記錄。');
+        function uploadPersonalReport(records) {
+            if (PERSONAL_REPORT_URL.includes('你的個人報告網址')) {
+                console.warn('⚠️ 個人報告網址尚未設定');
                 return;
             }
 
+            const observer = document.getElementById('observerName').value || '未填寫';
+            const date = document.getElementById('obsDate').value || '未填寫';
+            const period = globalPeriod || '未選擇';
+            const division = globalDivision || '未選擇';
+            const counts = getCountValues();
+
+            const endedRecords = records.filter(rec => rec.endTime);
+            if (endedRecords.length === 0) return;
+
+            const recordsToSubmit = endedRecords.map(rec => ({
+                observer: observer, date: date, period: period, division: division,
+                observerCount: counts.observerCount, staffCount: counts.staffCount,
+                counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
+                gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
+                action: rec.action || '', note: rec.note || '',
+                stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
+                recordTime: rec.recordTime
+            }));
+
+            fetch(PERSONAL_REPORT_URL, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(recordsToSubmit)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) console.log('✅ 個人報告上傳成功，共 ' + result.count + ' 筆');
+            })
+            .catch(error => console.error('❌ 個人報告上傳錯誤:', error));
+        }
+
+        // ================================================================
+        // 手動同步
+        // ================================================================
+        function manualSyncToSheets() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何觀察記錄可提交！');
+                return;
+            }
             const btn = document.querySelector('.google-btn');
             const originalText = btn.textContent;
-            btn.textContent = '提交中...';
+            btn.textContent = '同步中...';
             btn.disabled = true;
-
             sendToGoogleSheets(allRecords);
-
             setTimeout(() => {
                 btn.textContent = originalText;
                 btn.disabled = false;
-                alert('數據已提交至 Google Sheets！');
+                alert('數據已同步至 Google Sheets！');
             }, 1000);
         }
 
         // ================================================================
-        // 頁面切換函數
+        // 下載 CSV + Excel 並清空記錄
+        // ================================================================
+        function downloadAndClear() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何記錄可下載！');
+                return;
+            }
+            exportCSV();
+            setTimeout(() => { exportExcel(); }, 500);
+            setTimeout(() => {
+                if (confirm('數據已下載，是否清空當前所有記錄？')) {
+                    allRecords = [];
+                    currentObs = createBlankObsItem();
+                    saveLocalStorage();
+                    renderObservationCard();
+                    refreshTable();
+                    alert('所有記錄已清空！');
+                }
+            }, 1500);
+        }
+
+        // ================================================================
+        // 頁面切換
         // ================================================================
         function showPage(pageId) {
             document.querySelectorAll('.page-container').forEach(el => el.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
         }
-
-        function goHome() {
-            showPage('page-home');
-        }
-
-        function goToAdmin() {
-            showPage('page-admin');
-        }
-
+        function goHome() { showPage('page-home'); }
+        function goToAdmin() { showPage('page-admin'); }
         function goToSelectObserver() {
             showPage('page-select-observer');
             document.querySelectorAll('.observer-option-btn').forEach(btn => btn.classList.remove('selected'));
             document.getElementById('selectedDisplay').textContent = '';
         }
-
         function goToObserver() {
             showPage('page-observer');
             if (!currentObs) {
@@ -1527,24 +1487,17 @@
             }
         }
 
-        // ===== 選擇觀察員 =====
         function selectObserver(name) {
             document.querySelectorAll('.observer-option-btn').forEach(btn => btn.classList.remove('selected'));
-
             if (name === 'Other') {
                 document.getElementById('selectedDisplay').textContent = '您選擇了 Other，請在觀察頁自行填寫姓名。';
                 document.getElementById('observerName').value = '';
                 setTimeout(goToObserver, 300);
                 return;
             }
-
-            const buttons = document.querySelectorAll('.observer-option-btn');
-            buttons.forEach(btn => {
-                if (btn.textContent.trim() === name) {
-                    btn.classList.add('selected');
-                }
+            document.querySelectorAll('.observer-option-btn').forEach(btn => {
+                if (btn.textContent.trim() === name) btn.classList.add('selected');
             });
-
             document.getElementById('selectedDisplay').innerHTML = '已選擇：<strong>' + name + '</strong>';
             document.getElementById('observerName').value = name;
             localStorage.setItem('selectedObserver', name);
@@ -1552,19 +1505,15 @@
         }
 
         // ================================================================
-        // Admin 頁面功能（從 CSV 載入數據）
+        // Admin 功能
         // ================================================================
-
         let adminData = [];
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const csvText = e.target.result;
-                parseCSVData(csvText);
-            };
+            reader.onload = function(e) { parseCSVData(e.target.result); };
             reader.readAsText(file);
         }
 
@@ -1574,25 +1523,19 @@
                 alert('CSV 檔案格式不正確，請確保包含標頭列。');
                 return;
             }
-
             const headers = parseCSVLine(lines[0]);
             const records = [];
-
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
                 if (values.length < headers.length) continue;
                 const record = {};
-                headers.forEach((h, idx) => {
-                    record[h] = values[idx] ? values[idx].trim() : '';
-                });
+                headers.forEach((h, idx) => { record[h] = values[idx] ? values[idx].trim() : ''; });
                 records.push(record);
             }
-
             if (records.length === 0) {
                 alert('沒有找到有效數據。');
                 return;
             }
-
             adminData = records;
             renderAdminDashboard();
             alert('成功載入 ' + adminData.length + ' 筆記錄！');
@@ -1631,39 +1574,30 @@
         function renderAdminDashboard() {
             const allCases = adminData;
             const observerMap = {};
-
             allCases.forEach(record => {
                 const observer = record.觀察者 || 'Unknown';
-                if (!observerMap[observer]) {
-                    observerMap[observer] = [];
-                }
+                if (!observerMap[observer]) observerMap[observer] = [];
                 observerMap[observer].push(record);
             });
-
             const totalCases = allCases.length;
             const totalObservers = Object.keys(observerMap).length;
-
             document.getElementById('totalCases').textContent = totalCases;
             document.getElementById('totalObservers').textContent = totalObservers;
 
             const grid = document.getElementById('adminObserverGrid');
             grid.innerHTML = '';
-
             const observerNames = Object.keys(observerMap);
             if (observerNames.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無數據</div>';
             }
-
             observerNames.forEach(name => {
                 const cases = observerMap[name];
-                const caseCount = cases.length;
-
                 const card = document.createElement('div');
                 card.className = 'admin-observer-card';
                 card.innerHTML = `
                     <div class="admin-observer-name">${name}</div>
                     <div class="admin-observer-stats">
-                        <span><span class="stat-value">${caseCount}</span> <span class="stat-label">總案件</span></span>
+                        <span><span class="stat-value">${cases.length}</span> <span class="stat-label">總案件</span></span>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -1671,12 +1605,10 @@
 
             const tbody = document.getElementById('adminDetailBody');
             tbody.innerHTML = '';
-
             if (allCases.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
                 return;
             }
-
             const displayCases = allCases.slice(0, 100);
             displayCases.forEach(record => {
                 const tr = document.createElement('tr');
@@ -1691,7 +1623,6 @@
                 `;
                 tbody.appendChild(tr);
             });
-
             if (allCases.length > 100) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td colspan="7" style="text-align:center;color:var(--neutral-gray-400);">顯示最近 100 筆，共 ${allCases.length} 筆</td>`;
@@ -1700,33 +1631,19 @@
         }
 
         function exportAdminCSV() {
-            if (adminData.length === 0) {
-                alert('沒有數據可匯出！請先上傳 CSV 檔案。');
-                return;
-            }
-
+            if (adminData.length === 0) { alert('沒有數據可匯出！'); return; }
             const headers = ['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
             let csvContent = "\uFEFF" + headers.join(",") + "\n";
-
             adminData.forEach(rec => {
                 const row = [
-                    rec.觀察者 || '',
-                    rec.報案人編號 || '',
-                    rec.觀察日期 || '',
-                    rec.觀察時段 || '',
-                    rec.報案室 || '',
-                    rec.性別 || '',
-                    rec.年齡層 || '',
-                    rec.族裔 || '',
-                    rec.行為動作 || '',
-                    rec.動作備註 || '',
-                    rec.階段歷時 || '',
-                    rec.總時長 || '',
+                    rec.觀察者 || '', rec.報案人編號 || '', rec.觀察日期 || '',
+                    rec.觀察時段 || '', rec.報案室 || '', rec.性別 || '',
+                    rec.年齡層 || '', rec.族裔 || '', rec.行為動作 || '',
+                    rec.動作備註 || '', rec.階段歷時 || '', rec.總時長 || '',
                     rec.記錄時間 || ''
                 ].map(v => `"${String(v).replace(/"/g, '""')}"`);
                 csvContent += row.join(",") + "\n";
             });
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1739,32 +1656,18 @@
         }
 
         function exportAdminExcel() {
-            if (adminData.length === 0) {
-                alert('沒有數據可匯出！請先上傳 CSV 檔案。');
-                return;
-            }
-
+            if (adminData.length === 0) { alert('沒有數據可匯出！'); return; }
             const data = [];
             data.push(['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間']);
-
             adminData.forEach(rec => {
                 data.push([
-                    rec.觀察者 || '',
-                    rec.報案人編號 || '',
-                    rec.觀察日期 || '',
-                    rec.觀察時段 || '',
-                    rec.報案室 || '',
-                    rec.性別 || '',
-                    rec.年齡層 || '',
-                    rec.族裔 || '',
-                    rec.行為動作 || '',
-                    rec.動作備註 || '',
-                    rec.階段歷時 || '',
-                    rec.總時長 || '',
+                    rec.觀察者 || '', rec.報案人編號 || '', rec.觀察日期 || '',
+                    rec.觀察時段 || '', rec.報案室 || '', rec.性別 || '',
+                    rec.年齡層 || '', rec.族裔 || '', rec.行為動作 || '',
+                    rec.動作備註 || '', rec.階段歷時 || '', rec.總時長 || '',
                     rec.記錄時間 || ''
                 ]);
             });
-
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(data);
             ws['!cols'] = [
@@ -1821,7 +1724,7 @@
         });
 
         // ================================================================
-        // 行為動作清單（五種顏色分組）
+        // 核心行為記錄功能
         // ================================================================
         const actionGroups = [
             { action: '留意到取票機', group: 'group-1' },
@@ -1837,15 +1740,10 @@
             { action: '完成網上服務報案', group: 'group-5' }
         ];
 
-        function getActionGroup(actionName) {
-            const found = actionGroups.find(item => item.action === actionName);
-            return found ? found.group : 'group-1';
-        }
-
         let globalDivision = "";
         let globalPeriod = "";
-        let allRecords = [];   
-        let currentObs = null; 
+        let allRecords = [];
+        let currentObs = null;
 
         function autoDetectDivision() {
             if (!navigator.geolocation) return;
@@ -1926,7 +1824,7 @@
         function createBlankObsItem() {
             return {
                 id: 'obs_' + Date.now(),
-                caseIndex: generateUniqueCaseId(), 
+                caseIndex: generateUniqueCaseId(),
                 isRunning: false,
                 elapsedSeconds: 0,
                 startTime: "",
@@ -1940,20 +1838,17 @@
 
         window.addEventListener('DOMContentLoaded', function() {
             const dateInput = document.getElementById('obsDate');
-            if(!dateInput.value) {
+            if (!dateInput.value) {
                 const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                dateInput.value = year + '-' + month + '-' + day;
+                dateInput.value = today.getFullYear() + '-' +
+                    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(today.getDate()).padStart(2, '0');
             }
             loadLocalStorage();
-
             const savedObserver = localStorage.getItem('selectedObserver');
             if (savedObserver && savedObserver !== 'Other') {
                 document.getElementById('observerName').value = savedObserver;
             }
-
             if (!currentObs) {
                 currentObs = createBlankObsItem();
             }
@@ -1961,10 +1856,8 @@
             refreshTable();
             setInterval(updateTimer, 1000);
             updateRealTimeClock();
-
             setTimeout(autoSelectPeriod, 300);
             setTimeout(autoDetectDivision, 800);
-
             showPage('page-home');
         });
 
@@ -2013,33 +1906,23 @@
                 `;
             }
 
-            // 生成動作按鈕（含顏色分組 + 櫃枱接待報案特殊處理）
             let actionsHtml = actionGroups.map(item => {
                 const act = item.action;
                 const group = item.group;
-                
-                // 特殊處理：櫃枱接待報案 → 加上 1-5 數字按鈕（圓形）
                 if (act === '櫃枱接待報案') {
                     const numberBtns = [1, 2, 3, 4, 5].map(num => `
-                        <button class="counter-btn" ${!obs.isRunning ? 'disabled' : ''} 
-                                onclick="recordAction('${num}號櫃枱接待報案')" 
-                                title="記錄 ${num} 號櫃枱接待報案">
-                            ${num}
-                        </button>
+                        <button class="counter-btn" ${!obs.isRunning ? 'disabled' : ''}
+                                onclick="recordAction('${num}號櫃枱接待報案')"
+                                title="記錄 ${num} 號櫃枱接待報案">${num}</button>
                     `).join('');
-                    
                     return `
                         <div class="action-pair ${group}" style="flex-wrap: nowrap;">
                             <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
-                            <div class="counter-btn-group">
-                                ${numberBtns}
-                            </div>
+                            <div class="counter-btn-group">${numberBtns}</div>
                             <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
                         </div>
                     `;
                 }
-                
-                // 其他動作正常顯示
                 return `
                     <div class="action-pair ${group}">
                         <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
@@ -2048,19 +1931,15 @@
                 `;
             }).join('');
 
-            // 注意：已移除「離開報案室」按鈕
-
             container.innerHTML = `
                 <div class="${cardClass}" data-id="${obs.id}">
                     <div class="col-header">
                         <div class="col-title-wrap">
                             <span class="col-label">報案人編號：</span>
-                            <input class="case-id-input-small" value="${obs.caseIndex}" 
-                                   onchange="changeCaseId(this)" placeholder="編號">
+                            <input class="case-id-input-small" value="${obs.caseIndex}" onchange="changeCaseId(this)" placeholder="編號">
                             <span class="col-status">${statusText}</span>
                         </div>
                     </div>
-
                     <div class="stopwatch-container">
                         <div class="col-stopwatch">${mins}:${secs}</div>
                         <div class="col-control-btns">
@@ -2068,7 +1947,6 @@
                             <button class="ctrl-btn btn-reset" onclick="resetTimer()">取消記錄</button>
                         </div>
                     </div>
-
                     <div class="col-timeline-section">
                         <div class="timeline-info-row">
                             <span>當前已持續時間：<strong>${mins}:${secs}</strong></span>
@@ -2081,24 +1959,20 @@
                         </div>
                         <div class="timeline-note">首個動作為自動起點，其後標示兩動作之間歷時，紅線為當前時間點。</div>
                     </div>
-
                     <h4>行為動作記錄</h4>
                     <div class="actions-container">
-                        <button class="quick-btn" ${!obs.isRunning ? 'disabled' : ''} onclick="quickMark()">
-                            快速記錄當下時間 (後補動作)
-                        </button>
+                        <button class="quick-btn" ${!obs.isRunning ? 'disabled' : ''} onclick="quickMark()">快速記錄當下時間 (後補動作)</button>
                         ${pendingBannerHtml}
                         ${actionsHtml}
                         <div class="custom-action-row">
-                            <input class="custom-action-input" placeholder="輸入其他自訂動作，按 Enter 記錄" 
+                            <input class="custom-action-input" placeholder="輸入其他自訂動作，按 Enter 記錄"
                                    onkeydown="if(event.key==='Enter')recordCustomAction(this, false)"
                                    ${!obs.isRunning ? 'disabled' : ''}>
-                            <button class="ctrl-btn btn-reset" style="background:#475569; white-space:nowrap; padding: 0 16px; font-size:13px;" 
+                            <button class="ctrl-btn btn-reset" style="background:#475569; white-space:nowrap; padding: 0 16px; font-size:13px;"
                                     ${!obs.isRunning ? 'disabled' : ''}
                                     onclick="recordCustomAction(document.querySelector('.custom-action-input'), true)">加備註記錄</button>
                         </div>
                     </div>
-
                     <div class="detail-section">
                         <h4>報案人表觀特徵</h4>
                         <div class="trait-grid">
@@ -2127,7 +2001,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="submit-section">
                         <button class="btn-submit" style="background-color: var(--neutral-gray-400);" onclick="submitCurrentObservation()">結束觀察</button>
                     </div>
@@ -2141,8 +2014,7 @@
             const clock = document.getElementById('realTimeClock');
             if (clock) {
                 const now = new Date();
-                const timeStr = now.toLocaleTimeString('zh-HK', { hour12: false });
-                clock.textContent = `當前時間：${timeStr}`;
+                clock.textContent = `當前時間：${now.toLocaleTimeString('zh-HK', { hour12: false })}`;
             }
         }
 
@@ -2272,8 +2144,7 @@
             renderObservationCard();
             syncCurrentObsToAllRecords();
             refreshTable();
-
-            // ===== 自動同步到 Google Sheets =====
+            // 自動同步到主試算表
             autoSyncToSheets(false);
         }
 
@@ -2325,12 +2196,12 @@
 
         function changeCaseId(inputEl) {
             const newVal = inputEl.value.trim();
-            if(!newVal) {
+            if (!newVal) {
                 inputEl.value = currentObs.caseIndex;
                 return;
             }
             allRecords.forEach(r => {
-                if(r.obsIndex === currentObs.caseIndex) r.obsIndex = newVal;
+                if (r.obsIndex === currentObs.caseIndex) r.obsIndex = newVal;
             });
             currentObs.caseIndex = newVal;
             saveLocalStorage();
@@ -2339,13 +2210,13 @@
 
         function updateTableFieldDirectly(uuid, field, val) {
             const rec = allRecords.find(r => r.uuid === uuid);
-            if(rec) {
+            if (rec) {
                 rec[field] = val;
-                if(field === 'action') {
+                if (field === 'action') {
                     rec.isPending = false;
                     if (currentObs) {
                         const innerEvt = currentObs.timelineEvents.find(e => e.uuid === uuid);
-                        if(innerEvt) {
+                        if (innerEvt) {
                             innerEvt.action = val;
                             innerEvt.isPending = false;
                         }
@@ -2353,7 +2224,7 @@
                 } else if (field === 'note') {
                     if (currentObs) {
                         const innerEvt = currentObs.timelineEvents.find(e => e.uuid === uuid);
-                        if(innerEvt) {
+                        if (innerEvt) {
                             innerEvt.note = val;
                         }
                     }
@@ -2377,7 +2248,7 @@
                 placeholder: "請填寫此時間點發生的具體行為動作（必填）",
                 showSkip: false,
                 onSave: (val) => {
-                    if(!val.trim()) {
+                    if (!val.trim()) {
                         alert('動作名稱不能留空！');
                         return;
                     }
@@ -2387,7 +2258,7 @@
                     renderObservationCard();
                     refreshTable();
                     setTimeout(() => {
-                        if(currentObs.timelineEvents.some(e => e.isPending)) fillPendingName();
+                        if (currentObs.timelineEvents.some(e => e.isPending)) fillPendingName();
                     }, 200);
                 }
             });
@@ -2402,13 +2273,14 @@
                 alert('請先補齊所有「候補時間點」的動作名稱再進行結案提交！');
                 return;
             }
-            if(!confirm('確認手動強制結束並儲存當前個案嗎？')) return;
+            if (!confirm('確認手動強制結束並儲存當前個案嗎？')) return;
+
             currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
             currentObs.isRunning = false;
             syncCurrentObsToAllRecords();
 
-            // ===== 結束觀察時立即同步 =====
-            autoSyncToSheets(true);
+            // 上傳個人報告
+            uploadPersonalReport(allRecords);
 
             currentObs = createBlankObsItem();
             saveLocalStorage();
@@ -2443,7 +2315,6 @@
                     { key: 'totalDuration', editable: true },
                     { key: 'recordTime', editable: true }
                 ];
-
                 fields.forEach(f => {
                     const td = document.createElement('td');
                     if (f.editable) {
@@ -2476,7 +2347,7 @@
 
         function openCustomModal({ title, placeholder, showSkip, onSave }) {
             const exist = document.getElementById('dynamicModal');
-            if(exist) exist.remove();
+            if (exist) exist.remove();
             const mask = document.createElement('div');
             mask.className = 'modal-mask';
             mask.id = 'dynamicModal';
@@ -2495,7 +2366,7 @@
             const txt = mask.querySelector('.modal-textarea');
             txt.focus();
             mask.querySelector('#mCancel').onclick = () => mask.remove();
-            if(showSkip) {
+            if (showSkip) {
                 mask.querySelector('#mSkip').onclick = () => {
                     onSave("");
                     mask.remove();
@@ -2521,27 +2392,27 @@
         }
 
         function loadLocalStorage() {
-            if(localStorage.getItem('observerName')) document.getElementById('observerName').value = localStorage.getItem('observerName');
-            if(localStorage.getItem('obsDate')) document.getElementById('obsDate').value = localStorage.getItem('obsDate');
-            if(localStorage.getItem('observerCount')) document.getElementById('observerCount').value = localStorage.getItem('observerCount');
-            if(localStorage.getItem('staffCount')) document.getElementById('staffCount').value = localStorage.getItem('staffCount');
-            if(localStorage.getItem('counterCount')) document.getElementById('counterCount').value = localStorage.getItem('counterCount');
+            if (localStorage.getItem('observerName')) document.getElementById('observerName').value = localStorage.getItem('observerName');
+            if (localStorage.getItem('obsDate')) document.getElementById('obsDate').value = localStorage.getItem('obsDate');
+            if (localStorage.getItem('observerCount')) document.getElementById('observerCount').value = localStorage.getItem('observerCount');
+            if (localStorage.getItem('staffCount')) document.getElementById('staffCount').value = localStorage.getItem('staffCount');
+            if (localStorage.getItem('counterCount')) document.getElementById('counterCount').value = localStorage.getItem('counterCount');
             globalDivision = localStorage.getItem('globalDivision') || "";
             globalPeriod = localStorage.getItem('globalPeriod') || "";
             document.querySelectorAll('#divisionGroup .select-btn').forEach(b => {
-                if(b.getAttribute('onclick').includes(`'${globalDivision}'`)) b.classList.add('active');
+                if (b.getAttribute('onclick').includes(`'${globalDivision}'`)) b.classList.add('active');
             });
             document.querySelectorAll('#periodGroup .select-btn').forEach(b => {
-                if(b.getAttribute('onclick').includes(`'${globalPeriod}'`)) b.classList.add('active');
+                if (b.getAttribute('onclick').includes(`'${globalPeriod}'`)) b.classList.add('active');
             });
             allRecords = JSON.parse(localStorage.getItem('allRecords')) || [];
-            if(localStorage.getItem('currentObs')) {
+            if (localStorage.getItem('currentObs')) {
                 currentObs = JSON.parse(localStorage.getItem('currentObs'));
             }
         }
 
         function clearAllRecords() {
-            if(confirm('警告：這將會清空數據庫中「全部」已記錄的報案人行為歷史，且無法還原！\n確認清空？')) {
+            if (confirm('警告：這將會清空數據庫中「全部」已記錄的報案人行為歷史，且無法還原！\n確認清空？')) {
                 allRecords = [];
                 currentObs = createBlankObsItem();
                 saveLocalStorage();
@@ -2560,24 +2431,15 @@
             let csvContent = "\uFEFF" + headers.join(",") + "\n";
             allRecords.forEach(rec => {
                 const row = [
-                    rec.obsIndex,
-                    rec.observer || '',
-                    rec.date || '',
-                    rec.period || '',
-                    rec.division || '',
+                    rec.obsIndex, rec.observer || '', rec.date || '',
+                    rec.period || '', rec.division || '',
                     rec.observerCount !== undefined ? rec.observerCount : '',
                     rec.staffCount !== undefined ? rec.staffCount : '',
                     rec.counterCount !== undefined ? rec.counterCount : '',
-                    rec.startTime || '',
-                    rec.endTime || '',
-                    rec.gender,
-                    rec.age,
-                    rec.ethnicity,
-                    rec.action,
-                    rec.note || '',
-                    rec.stageDuration,
-                    rec.totalDuration,
-                    rec.recordTime
+                    rec.startTime || '', rec.endTime || '',
+                    rec.gender, rec.age, rec.ethnicity,
+                    rec.action, rec.note || '',
+                    rec.stageDuration, rec.totalDuration, rec.recordTime
                 ].map(v => `"${String(v).replace(/"/g, '""')}"`);
                 csvContent += row.join(",") + "\n";
             });
@@ -2589,6 +2451,7 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function removeEmoji(str) {
@@ -2601,20 +2464,16 @@
                 alert('無任何數據可匯出！');
                 return;
             }
-
             const groups = {};
             allRecords.forEach(rec => {
                 if (!groups[rec.obsIndex]) groups[rec.obsIndex] = [];
                 groups[rec.obsIndex].push(rec);
             });
-
             const wb = XLSX.utils.book_new();
-
             for (const [obsIndex, records] of Object.entries(groups)) {
                 records.sort((a, b) => (a.recordTime || '').localeCompare(b.recordTime || ''));
                 const first = records[0];
                 const data = [];
-
                 data.push(['觀察者姓名：', first.observer || '']);
                 data.push(['日期：', first.date || '', '時段：', first.period || '', '報案室：', first.division || '']);
                 data.push(['觀察開始時間：', first.startTime || '', '觀察完成時間：', first.endTime || '']);
@@ -2623,7 +2482,6 @@
                 data.push(['報案人編號：', obsIndex, '性別：', first.gender || '', '年齡：', first.age || '', '族裔：', first.ethnicity || '']);
                 data.push([]);
                 data.push(['日期', '記錄時間', '行為動作', '階段歷時(秒)', '總時長(秒)', '備註']);
-
                 records.forEach(rec => {
                     data.push([
                         rec.date || '',
@@ -2634,20 +2492,13 @@
                         rec.note || ''
                     ]);
                 });
-
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 ws['!cols'] = [
-                    { wch: 15 },
-                    { wch: 15 },
-                    { wch: 30 },
-                    { wch: 18 },
-                    { wch: 18 },
-                    { wch: 25 }
+                    { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 18 }, { wch: 18 }, { wch: 25 }
                 ];
                 let sheetName = obsIndex.replace(/[\\:*?/\[\]]/g, '').substring(0, 31);
                 XLSX.utils.book_append_sheet(wb, ws, sheetName);
             }
-
             const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
             const blob = new Blob([wbout], { type: 'application/octet-stream' });
             const link = document.createElement('a');
