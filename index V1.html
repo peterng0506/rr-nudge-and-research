@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Room Nudge & Research</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --police-blue: #00205B;
+            --police-light-blue: #0038A8;
+            --success-green: #2E7D32;
+            --warning-red: #C62828;
+            --neutral-gray-50: #F8FAFC;
+            --neutral-gray-100: #E9EEF2;
+            --neutral-gray-200: #CBD5E1;
+            --neutral-gray-300: #94A3B8;
+            --neutral-gray-400: #64748B;
+            --neutral-gray-800: #1E293B;
+            --orange-warning: #F59E0B;
+            --orange-bg: #FFFBEB;
+            --danger-bg: #FEE2E2;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 3px 8px rgba(0,0,0,0.09);
+            --shadow-lg: 0 6px 16px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --transition-fast: all 0.2s ease-in-out;
+            --google-blue: #4285F4;
+            --upload-green: #2E7D32;
+            --clear-red: #C62828;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+            background-color: var(--neutral-gray-50);
+            margin: 0;
+            padding: 16px;
+            color: var(--neutral-gray-800);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        h3 {
+            margin-top: 0;
+            color: var(--police-blue);
+            border-bottom: 2px solid var(--neutral-gray-200);
+            padding-bottom: 8px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        h4 {
+            margin: 16px 0 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--neutral-gray-800);
+        }
+        .required { color: var(--warning-red); }
+        .tip-text {
+            font-size: 12px;
+            color: var(--neutral-gray-300);
+            margin: 2px 0 8px;
+        }
+        .global-info-panel {
+            background: #fff;
+            padding: 18px 22px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        .global-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .form-item {
+            flex: 1;
+            min-width: 150px;
+        }
+        .form-item label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .form-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition-fast);
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .form-input-number {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition-fast);
+            -moz-appearance: textfield;
+        }
+        .form-input-number::-webkit-outer-spin-button,
+        .form-input-number::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .form-input-number:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 6px 0;
+        }
+        .select-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 8px 6px;
+            font-size: 13px;
+            border: 1px solid var(--neutral-gray-200);
+            background: #fff;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .select-btn:hover:not(.active) { background-color: var(--neutral-gray-100); }
+        .select-btn.active {
+            background-color: var(--police-light-blue);
+            color: white;
+            border-color: var(--police-light-blue);
+            font-weight: 600;
+        }
+        .single-obs-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .obs-card {
+            width: 100%;
+            max-width: 850px;
+            background: #fff;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--neutral-gray-200);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
+            position: relative;
+        }
+        .obs-card.running {
+            border-color: var(--success-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+        }
+        .obs-card.paused {
+            border-color: var(--orange-warning);
+        }
+        .col-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--neutral-gray-100);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .col-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .col-label {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--police-blue);
+        }
+        .case-id-input-small {
+            width: 150px;
+            padding: 6px 8px;
+            border: 1px solid var(--police-light-blue);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--police-blue);
+            text-align: center;
+            letter-spacing: 0.5px;
+            transition: var(--transition-fast);
+        }
+        .case-id-input-small:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .col-status {
+            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: var(--neutral-gray-200);
+            color: #333;
+            margin-left: 6px;
+            font-weight: 600;
+            transition: var(--transition-fast);
+        }
+        .obs-card.running .col-status {
+            background: var(--success-green);
+            color: #fff;
+        }
+        .obs-card.paused .col-status {
+            background: var(--orange-warning);
+            color: #fff;
+        }
+        .stopwatch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--neutral-gray-50);
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+            border: 1px solid var(--neutral-gray-200);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .col-stopwatch {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--neutral-gray-800);
+            font-variant-numeric: tabular-nums;
+        }
+        .col-control-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .ctrl-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition-fast);
+        }
+        .ctrl-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(50%);
+        }
+        .btn-start { background: var(--success-green); color: #fff; }
+        .btn-reset { background: #64748B; color: #fff; }
+        .col-timeline-section {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--neutral-gray-200);
+        }
+        .timeline-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: var(--neutral-gray-800);
+            font-weight: 500;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .timeline-wrap {
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 100px;
+            background: var(--neutral-gray-50);
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            position: relative;
+            padding: 16px 0;
+            scroll-behavior: smooth;
+        }
+        .timeline-track {
+            height: 4px;
+            background: var(--neutral-gray-300);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            min-width: 100%;
+        }
+        .timeline-now-line {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--warning-red);
+            z-index: 2;
+        }
+        .timeline-event {
+            position: absolute;
+            transform: translateX(-50%);
+            top: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 3;
+            background: var(--police-light-blue);
+            color: #fff;
+        }
+        .timeline-event.pending-event {
+            background: var(--orange-warning);
+            color: #fff;
+        }
+        .timeline-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            position: absolute;
+            top: calc(50% - 3.5px);
+            transform: translateX(-50%);
+            z-index: 3;
+            background: var(--police-light-blue);
+        }
+        .timeline-dot.pending-dot {
+            background: var(--orange-warning);
+        }
+        .timeline-note {
+            font-size: 12px;
+            color: var(--neutral-gray-400);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .pending-banner {
+            grid-column: 1 / -1;
+            background: var(--orange-bg);
+            border: 1px solid var(--orange-warning);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #B45309;
+            font-weight: 600;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .actions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .action-pair {
+            display: flex;
+            align-items: stretch;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: #fff;
+            transition: var(--transition-fast);
+            min-height: 48px;
+        }
+        .action-pair:hover {
+            border-color: var(--police-light-blue);
+        }
+        .action-pair.group-1 { background: #E3F2FD; border-color: #64B5F6; }
+        .action-pair.group-1 .action-btn-main { background: #E3F2FD; color: #0D47A1; }
+        .action-pair.group-1 .action-btn-main:hover:not(:disabled) { background: #BBDEFB; }
+        .action-pair.group-1 .action-btn-note { background: #1976D2; color: #fff; border-left-color: #64B5F6; }
+        .action-pair.group-1 .action-btn-note:hover:not(:disabled) { background: #0D47A1; }
+        .action-pair.group-2 { background: #E8F5E9; border-color: #81C784; }
+        .action-pair.group-2 .action-btn-main { background: #E8F5E9; color: #1B5E20; }
+        .action-pair.group-2 .action-btn-main:hover:not(:disabled) { background: #C8E6C9; }
+        .action-pair.group-2 .action-btn-note { background: #388E3C; color: #fff; border-left-color: #81C784; }
+        .action-pair.group-2 .action-btn-note:hover:not(:disabled) { background: #1B5E20; }
+        .action-pair.group-3 { background: #FFF3E0; border-color: #FFB74D; }
+        .action-pair.group-3 .action-btn-main { background: #FFF3E0; color: #E65100; }
+        .action-pair.group-3 .action-btn-main:hover:not(:disabled) { background: #FFE0B2; }
+        .action-pair.group-3 .action-btn-note { background: #F57C00; color: #fff; border-left-color: #FFB74D; }
+        .action-pair.group-3 .action-btn-note:hover:not(:disabled) { background: #E65100; }
+        .action-pair.group-4 { background: #F3E5F5; border-color: #BA68C8; }
+        .action-pair.group-4 .action-btn-main { background: #F3E5F5; color: #4A148C; }
+        .action-pair.group-4 .action-btn-main:hover:not(:disabled) { background: #E1BEE7; }
+        .action-pair.group-4 .action-btn-note { background: #7B1FA2; color: #fff; border-left-color: #BA68C8; }
+        .action-pair.group-4 .action-btn-note:hover:not(:disabled) { background: #4A148C; }
+        .action-pair.group-5 { background: #E0F7FA; border-color: #4DD0E1; }
+        .action-pair.group-5 .action-btn-main { background: #E0F7FA; color: #006064; }
+        .action-pair.group-5 .action-btn-main:hover:not(:disabled) { background: #B2EBF2; }
+        .action-pair.group-5 .action-btn-note { background: #00838F; color: #fff; border-left-color: #4DD0E1; }
+        .action-pair.group-5 .action-btn-note:hover:not(:disabled) { background: #006064; }
+
+        .action-btn-main {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 600;
+            transition: var(--transition-fast);
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+        .action-btn-main:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-btn-note {
+            padding: 0 12px;
+            border: none;
+            border-left: 1px solid rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            transition: var(--transition-fast);
+            min-width: 60px;
+            min-height: 48px;
+            background: var(--neutral-gray-100);
+            color: var(--neutral-gray-800);
+        }
+        .action-btn-note:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-btn-note:hover:not(:disabled) {
+            filter: brightness(0.9);
+        }
+
+        .counter-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 6px;
+            flex-shrink: 0;
+            background: transparent;
+        }
+        .counter-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #7B1FA2;
+            border-radius: 50%;
+            background: #F3E5F5;
+            color: #4A148C;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .counter-btn:hover:not(:disabled) {
+            background: #7B1FA2;
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .counter-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .quick-btn {
+            grid-column: 1 / -1;
+            padding: 12px;
+            background: var(--orange-bg);
+            border: 1px solid var(--orange-warning);
+            color: #B45309;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+        .quick-btn:hover:not(:disabled) { background: #FEF3C7; }
+        .quick-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .custom-action-row {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .custom-action-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            transition: var(--transition-fast);
+            min-width: 150px;
+        }
+        .custom-action-input:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .custom-action-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: var(--neutral-gray-50);
+        }
+        .detail-section {
+            padding-top: 16px;
+            border-top: 1px dashed var(--neutral-gray-200);
+            margin-bottom: 24px;
+        }
+        .trait-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .trait-group strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--neutral-gray-800);
+        }
+        .submit-section {
+            padding-top: 20px;
+            border-top: 2px solid var(--neutral-gray-200);
+            text-align: center;
+        }
+        .btn-submit {
+            background-color: var(--police-blue);
+            color: white;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-submit:hover {
+            background-color: var(--police-light-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .table-panel {
+            background: #fff;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow-x: auto;
+        }
+        .table-wrap {
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+        table {
+            min-width: 1100px;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid var(--neutral-gray-200);
+            padding: 6px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        th {
+            background-color: var(--neutral-gray-100);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        tbody tr:nth-child(even) { background-color: var(--neutral-gray-50); }
+        tbody tr:hover { background-color: rgba(0, 56, 168, 0.04); }
+        .time-cell { font-weight:700; color:var(--warning-red); }
+        .table-input {
+            width: 100%;
+            min-width: 60px;
+            padding: 4px 6px;
+            font-size: 13px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            transition: var(--transition-fast);
+        }
+        .table-input:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 2px rgba(0, 56, 168, 0.15);
+        }
+        .table-input.action-input {
+            border-color: var(--orange-warning);
+            background-color: var(--orange-bg);
+        }
+        .table-input.action-input:focus {
+            background-color: #fff;
+        }
+        .table-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .upload-btn, .clear-btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-align: center;
+        }
+        .upload-btn {
+            background-color: var(--upload-green);
+            color: white;
+        }
+        .upload-btn:hover {
+            background-color: #1B5E20;
+        }
+        .clear-btn {
+            background-color: var(--clear-red);
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #B71C1C;
+        }
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-box {
+            background: #fff;
+            padding: 24px;
+            border-radius: var(--radius-md);
+            min-width: 400px;
+            max-width: 95%;
+            box-shadow: var(--shadow-lg);
+            transform: scale(1);
+            animation: scaleUp 0.2s ease-out;
+        }
+        @keyframes scaleUp {
+            from { transform: scale(0.95); }
+            to { transform: scale(1); }
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 12px;
+        }
+        .modal-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            margin: 10px 0 16px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: var(--transition-fast);
+        }
+        .modal-textarea:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 90px;
+            transition: var(--transition-fast);
+        }
+        .modal-save { background: var(--police-light-blue); color: white; }
+        .modal-save:hover { background: var(--police-blue); }
+        .modal-skip { background: var(--neutral-gray-200); color: #1E293B; }
+        .modal-skip:hover { background: var(--neutral-gray-300); }
+        .modal-cancel { background: var(--danger-bg); color: var(--warning-red); border: 1px solid var(--warning-red); margin-right: auto; }
+        .modal-cancel:hover { background: var(--warning-red); color: white; }
+        .privacy-banner {
+            background-color: var(--orange-bg);
+            color: #B45309;
+            padding: 10px 16px;
+            border-left: 6px solid var(--orange-warning);
+            margin-bottom: 16px;
+            font-size: 13px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+        }
+
+        .page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            display: none;
+        }
+        .page-container.active {
+            display: block;
+        }
+
+        .home-wrapper {
+            background: #fff;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-top: 40px;
+        }
+        .home-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .home-subtitle {
+            font-size: 16px;
+            color: var(--neutral-gray-400);
+            margin-bottom: 40px;
+        }
+        .home-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .home-btn {
+            min-width: 180px;
+            padding: 14px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            color: #fff;
+            background-color: var(--police-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .home-btn.observer {
+            background-color: var(--success-green);
+        }
+        .home-btn.observer:hover {
+            background-color: #1B5E20;
+        }
+        .home-btn.admin {
+            background-color: var(--neutral-gray-400);
+        }
+        .home-btn.admin:hover {
+            background-color: #475569;
+        }
+
+        .select-observer-wrapper {
+            background: #fff;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-top: 40px;
+        }
+        .select-observer-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 8px;
+        }
+        .select-observer-subtitle {
+            font-size: 14px;
+            color: var(--neutral-gray-400);
+            margin-bottom: 30px;
+        }
+        .observer-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .observer-option-btn {
+            min-width: 120px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            color: var(--neutral-gray-800);
+        }
+        .observer-option-btn:hover:not(.selected) {
+            border-color: var(--police-light-blue);
+            background: var(--neutral-gray-50);
+        }
+        .observer-option-btn.selected {
+            border-color: var(--police-light-blue);
+            background: var(--police-light-blue);
+            color: white;
+        }
+        .observer-option-btn.other-btn {
+            border-color: var(--neutral-gray-300);
+            color: var(--neutral-gray-600);
+        }
+        .observer-option-btn.other-btn:hover {
+            border-color: var(--orange-warning);
+            background: var(--orange-bg);
+            color: var(--orange-warning);
+        }
+        .selected-display {
+            font-size: 16px;
+            color: var(--neutral-gray-600);
+            margin-bottom: 24px;
+            min-height: 28px;
+        }
+        .selected-display strong {
+            color: var(--police-blue);
+        }
+        .select-observer-back {
+            background-color: #64748B;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .select-observer-back:hover {
+            background-color: #475569;
+        }
+
+        .admin-wrapper {
+            background: #fff;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--neutral-gray-200);
+            padding: 30px 30px;
+            box-shadow: var(--shadow-lg);
+            margin-top: 20px;
+        }
+        .admin-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 4px;
+        }
+        .admin-subtitle {
+            font-size: 14px;
+            color: var(--neutral-gray-400);
+            margin-bottom: 20px;
+        }
+        .admin-upload-area {
+            border: 2px dashed var(--neutral-gray-300);
+            border-radius: var(--radius-sm);
+            padding: 30px 20px;
+            text-align: center;
+            margin: 16px 0 24px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            background: var(--neutral-gray-50);
+        }
+        .admin-upload-area:hover {
+            border-color: var(--police-light-blue);
+            background: #fff;
+        }
+        .admin-upload-area.dragover {
+            border-color: var(--success-green);
+            background: var(--success-bg);
+        }
+        .admin-upload-area .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        .admin-upload-area .text {
+            font-size: 14px;
+            color: var(--neutral-gray-400);
+        }
+        .admin-upload-area .text strong {
+            color: var(--police-blue);
+        }
+        .admin-upload-area .sub-text {
+            font-size: 12px;
+            color: var(--neutral-gray-300);
+            margin-top: 4px;
+        }
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .admin-stat-card {
+            background: var(--neutral-gray-50);
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            text-align: center;
+        }
+        .admin-stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--police-blue);
+        }
+        .admin-stat-label {
+            font-size: 13px;
+            color: var(--neutral-gray-400);
+            margin-top: 4px;
+        }
+        .admin-observer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .admin-observer-card {
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            background: #fff;
+            transition: var(--transition-fast);
+        }
+        .admin-observer-card:hover {
+            border-color: var(--police-light-blue);
+        }
+        .admin-observer-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--police-blue);
+            margin-bottom: 8px;
+        }
+        .admin-observer-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            font-size: 13px;
+        }
+        .admin-observer-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .admin-observer-stats .stat-value {
+            font-weight: 700;
+            color: var(--neutral-gray-800);
+        }
+        .admin-observer-stats .stat-label {
+            color: var(--neutral-gray-400);
+        }
+        .admin-observer-progress {
+            margin-top: 10px;
+            background: var(--neutral-gray-200);
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+        }
+        .admin-observer-progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--success-green);
+            transition: width 0.5s ease;
+        }
+        .admin-observer-progress-bar.partial {
+            background: var(--orange-warning);
+        }
+        .admin-observer-progress-bar.low {
+            background: var(--warning-red);
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-tag.active {
+            background: #DCFCE7;
+            color: #166534;
+        }
+        .status-tag.ended {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+        .status-tag.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        .status-tag.submitted {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+        .admin-table-wrap {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        .admin-table-wrap table {
+            min-width: 600px;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .admin-table-wrap th, .admin-table-wrap td {
+            border: 1px solid var(--neutral-gray-200);
+            padding: 8px 12px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .admin-table-wrap th {
+            background-color: var(--neutral-gray-100);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .admin-table-wrap tbody tr:nth-child(even) {
+            background-color: var(--neutral-gray-50);
+        }
+        .admin-table-wrap tbody tr:hover {
+            background-color: rgba(0, 56, 168, 0.04);
+        }
+        .admin-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .back-btn {
+            background-color: #64748B;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .back-btn:hover {
+            background-color: #475569;
+        }
+        .last-updated {
+            font-size: 12px;
+            color: var(--neutral-gray-400);
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .home-wrapper, .select-observer-wrapper, .admin-wrapper {
+                padding: 30px 20px;
+            }
+            .home-title {
+                font-size: 24px;
+            }
+            .home-btn {
+                min-width: 140px;
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+            .home-buttons {
+                gap: 12px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .observer-option-btn {
+                min-width: 100px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            .admin-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .admin-observer-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-title {
+                font-size: 20px;
+            }
+            .counter-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+            .action-pair {
+                min-height: 44px;
+            }
+            .action-btn-main, .action-btn-note {
+                min-height: 44px;
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            .action-btn-note {
+                min-width: 50px;
+                padding: 0 8px;
+            }
+            .table-btn-group {
+                flex-direction: column;
+            }
+            .table-btn-group button {
+                width: 100%;
+            }
+        }
+        @media (max-width: 768px) {
+            .home-wrapper, .select-observer-wrapper, .admin-wrapper {
+                padding: 40px 24px;
+            }
+            .home-title {
+                font-size: 28px;
+            }
+            .admin-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 首頁 ===== -->
+    <div id="page-home" class="page-container active">
+        <div class="privacy-banner">
+            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+        </div>
+        <div class="home-wrapper">
+            <div class="home-title">Report Room Nudge &amp; Research</div>
+            <div class="home-subtitle">報案室行為觀察系統</div>
+            <div class="home-buttons">
+                <button class="home-btn admin" onclick="goToAdmin()">Administrator</button>
+                <button class="home-btn observer" onclick="goToSelectObserver()">Observer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 選擇觀察員頁面 ===== -->
+    <div id="page-select-observer" class="page-container">
+        <div class="privacy-banner">
+            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+        </div>
+        <div class="select-observer-wrapper">
+            <div class="select-observer-title">選擇觀察員</div>
+            <div class="select-observer-subtitle">請選擇您的身份，系統將自動帶入觀察者姓名</div>
+            <div class="observer-options">
+                <button class="observer-option-btn" onclick="selectObserver('Churchill')">Churchill</button>
+                <button class="observer-option-btn" onclick="selectObserver('Siu Wai')">Siu Wai</button>
+                <button class="observer-option-btn" onclick="selectObserver('Lily')">Lily</button>
+                <button class="observer-option-btn" onclick="selectObserver('Peter')">Peter</button>
+                <button class="observer-option-btn other-btn" onclick="selectObserver('Other')">Other</button>
+            </div>
+            <div class="selected-display" id="selectedDisplay"></div>
+            <button class="select-observer-back" onclick="goHome()">返回首頁</button>
+        </div>
+    </div>
+
+    <!-- ===== Admin 頁面 ===== -->
+    <div id="page-admin" class="page-container">
+        <div class="privacy-banner">
+            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+        </div>
+        <div style="margin-bottom: 16px; text-align: right;">
+            <button class="back-btn" onclick="goHome()">返回首頁</button>
+        </div>
+        <div class="admin-wrapper">
+            <div class="admin-title">管理員儀表板</div>
+            <div class="admin-subtitle">觀察員填寫進度總覽</div>
+            <div class="admin-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="icon">📤</div>
+                <div class="text">拖曳 CSV 檔案 到這裡，或點擊上傳</div>
+                <div class="sub-text">支援從 Google Sheets 下載的 CSV 檔案</div>
+                <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleFileUpload(event)">
+            </div>
+            <div class="admin-stats-grid" id="adminStatsGrid">
+                <div class="admin-stat-card"><div class="admin-stat-number" id="totalCases">0</div><div class="admin-stat-label">總案件數</div></div>
+                <div class="admin-stat-card"><div class="admin-stat-number" id="totalObservers">0</div><div class="admin-stat-label">觀察員人數</div></div>
+                <div class="admin-stat-card"><div class="admin-stat-number" id="totalSubmitted">0</div><div class="admin-stat-label">已提交案件</div></div>
+                <div class="admin-stat-card"><div class="admin-stat-number" id="totalActive">0</div><div class="admin-stat-label">進行中案件</div></div>
+            </div>
+            <h4 style="margin-bottom:12px;">觀察員進度</h4>
+            <div class="admin-observer-grid" id="adminObserverGrid">
+                <div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">請上傳 CSV 檔案以查看數據</div>
+            </div>
+            <h4 style="margin-bottom:12px;">所有案件明細</h4>
+            <div class="admin-table-wrap">
+                <table id="adminDetailTable">
+                    <thead><tr><th>觀察員</th><th>報案人編號</th><th>日期</th><th>時段</th><th>報案室</th><th>狀態</th><th>動作數</th></tr></thead>
+                    <tbody id="adminDetailBody"><tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">請上傳 CSV 檔案以查看數據</td></tr></tbody>
+                </table>
+            </div>
+            <div class="admin-actions">
+                <button class="admin-btn" onclick="exportAdminCSV()">匯出全部數據 (CSV)</button>
+                <button class="excel-btn" onclick="exportAdminExcel()">匯出 Excel 報告</button>
+                <button class="clear-btn" onclick="clearAdminData()">清除數據</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 觀察頁 ===== -->
+    <div id="page-observer" class="page-container">
+        <div class="privacy-banner">
+            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+        </div>
+        <div style="margin-bottom: 16px; text-align: right;">
+            <button class="ctrl-btn btn-reset" onclick="goHome()" style="background: #64748B; color: #fff;">返回首頁</button>
+        </div>
+        <div class="global-info-panel">
+            <h3>觀察基礎資訊 <span class="tip-text">（帶*為必填）</span></h3>
+            <div class="global-row">
+                <div class="form-item">
+                    <label>觀察者姓名 <span class="required">*</span></label>
+                    <input class="form-input" id="observerName" placeholder="請選擇觀察員" onchange="saveLocalStorage()">
+                </div>
+                <div class="form-item">
+                    <label>觀察日期 <span class="required">*</span></label>
+                    <input class="form-input" id="obsDate" type="date" onchange="saveLocalStorage()">
+                </div>
+                <div class="form-item">
+                    <label>觀察時段 <span class="required">*</span></label>
+                    <div class="btn-group" id="periodGroup">
+                        <button class="select-btn" onclick="selectPeriod('AM', this)">AM</button>
+                        <button class="select-btn" onclick="selectPeriod('PM', this)">PM</button>
+                        <button class="select-btn" onclick="selectPeriod('Evening', this)">Evening</button>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label>報案室 <span class="required">*</span></label>
+                    <div class="btn-group" id="divisionGroup">
+                        <button class="select-btn" onclick="selectDivision('TSTDIV RR', this)">TSTDIV</button>
+                        <button class="select-btn" onclick="selectDivision('MKDIST RR', this)">MKDIST</button>
+                        <button class="select-btn" onclick="selectDivision('YLDIV RR', this)">YLDIV</button>
+                        <button class="select-btn" onclick="selectDivision('TPDIV RR', this)">TPDIV</button>
+                    </div>
+                </div>
+            </div>
+            <div class="global-row" style="margin-top: 12px;">
+                <div class="form-item">
+                    <label>觀察員數目</label>
+                    <input class="form-input-number" id="observerCount" type="number" min="0" placeholder="0" onchange="saveLocalStorage()">
+                </div>
+                <div class="form-item">
+                    <label>職員數目</label>
+                    <input class="form-input-number" id="staffCount" type="number" min="0" placeholder="0" onchange="saveLocalStorage()">
+                </div>
+                <div class="form-item">
+                    <label>開放櫃枱數目</label>
+                    <input class="form-input-number" id="counterCount" type="number" min="0" placeholder="0" onchange="saveLocalStorage()">
+                </div>
+            </div>
+        </div>
+
+        <h3>當前報案人記錄</h3>
+        <div class="single-obs-wrap" id="obsContainer"></div>
+
+        <div class="table-panel">
+            <h3>全部觀察數據匯總表</h3>
+            <div class="table-wrap">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>報案人編號</th>
+                            <th>觀察者</th>
+                            <th>觀察日期</th>
+                            <th>觀察時段</th>
+                            <th>報案室</th>
+                            <th>觀察員數目</th>
+                            <th>職員數目</th>
+                            <th>開放櫃枱數目</th>
+                            <th>開始時間</th>
+                            <th>結束時間</th>
+                            <th>性別</th>
+                            <th>年齡層</th>
+                            <th>族裔</th>
+                            <th>行為動作</th>
+                            <th>動作備註</th>
+                            <th>階段歷時(秒)</th>
+                            <th>總時長(秒)</th>
+                            <th>記錄時間</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-body"></tbody>
+                </table>
+            </div>
+            <div class="table-btn-group">
+                <button class="upload-btn" onclick="uploadToCloud()">上傳至雲端</button>
+                <button class="clear-btn" onclick="clearAllRecordsWithDownload()">清空全部記錄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- JavaScript -->
+    <!-- ============================================================ -->
+    <script>
+        // ================================================================
+        // Google Sheets 設定
+        // ================================================================
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzBfqGZX5G5qeuI3_yvpknyAx-6CEmz5js9O8FEygANZhAPS3jkx9HXIDd1xdMK_LOg/exec';
+        const PERSONAL_REPORT_URL = 'https://script.google.com/macros/s/AKfycbwZf8XfVJBL84vTwQQelH9BlZVjyxs-aIyuPmMoNRkJm71-LAqkwYryAnk77XLMJmFmKw/exec';
+
+        // ================================================================
+        // 自動同步函數（每次記錄動作時自動觸發）
+        // ================================================================
+        let syncTimeout = null;
+        let syncQueue = [];
+
+        function autoSyncToSheets(immediate = false) {
+            if (allRecords.length === 0) return;
+            if (immediate) {
+                sendToGoogleSheets(allRecords);
+                return;
+            }
+            syncQueue = allRecords.slice();
+            if (syncTimeout) clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(() => {
+                if (syncQueue.length > 0) {
+                    sendToGoogleSheets(syncQueue);
+                    syncQueue = [];
+                }
+                syncTimeout = null;
+            }, 2000);
+        }
+
+        function sendToGoogleSheets(records) {
+            const observer = document.getElementById('observerName').value || '未填寫';
+            const date = document.getElementById('obsDate').value || '未填寫';
+            const period = globalPeriod || '未選擇';
+            const division = globalDivision || '未選擇';
+            const counts = getCountValues();
+
+            const recordsToSubmit = records.map(rec => ({
+                observer: observer, date: date, period: period, division: division,
+                observerCount: counts.observerCount, staffCount: counts.staffCount,
+                counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
+                gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
+                action: rec.action || '', note: rec.note || '',
+                stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
+                recordTime: rec.recordTime
+            }));
+
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(recordsToSubmit)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) console.log('同步成功，共 ' + result.count + ' 筆');
+            })
+            .catch(error => console.error('同步錯誤:', error));
+        }
+
+        // ================================================================
+        // 上傳至雲端（手動觸發，上傳到主試算表 + 個人報告）
+        // ================================================================
+        function uploadToCloud() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何記錄可以上傳！');
+                return;
+            }
+
+            const btn = document.querySelector('.upload-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '上傳中...';
+            btn.disabled = true;
+
+            // 1. 上傳到主試算表
+            sendToGoogleSheets(allRecords);
+
+            // 2. 上傳個人報告
+            const observer = document.getElementById('observerName').value || '未填寫';
+            const date = document.getElementById('obsDate').value || '未填寫';
+            const period = globalPeriod || '未選擇';
+            const division = globalDivision || '未選擇';
+            const counts = getCountValues();
+
+            const endedRecords = allRecords.filter(rec => rec.endTime);
+            if (endedRecords.length > 0) {
+                const recordsToSubmit = endedRecords.map(rec => ({
+                    observer: observer, date: date, period: period, division: division,
+                    observerCount: counts.observerCount, staffCount: counts.staffCount,
+                    counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
+                    gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
+                    action: rec.action || '', note: rec.note || '',
+                    stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
+                    recordTime: rec.recordTime
+                }));
+
+                fetch(PERSONAL_REPORT_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(recordsToSubmit)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) console.log('個人報告上傳成功，共 ' + result.count + ' 筆');
+                })
+                .catch(error => console.error('個人報告上傳錯誤:', error));
+            }
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                alert('數據已成功上傳至雲端！');
+            }, 1500);
+        }
+
+        // ================================================================
+        // 清空全部記錄（下載 CSV + Excel，然後清空）
+        // ================================================================
+        function clearAllRecordsWithDownload() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何記錄可下載或清空！');
+                return;
+            }
+
+            if (!confirm('確定要下載並清空所有記錄嗎？\n\n此操作將：\n1. 下載 CSV 檔案\n2. 下載 Excel 報告\n3. 清空所有本地記錄\n\n此操作無法復原！')) {
+                return;
+            }
+
+            // 1. 匯出 CSV
+            exportCSV();
+
+            // 2. 匯出 Excel（延遲確保下載完成）
+            setTimeout(() => {
+                exportExcel();
+            }, 500);
+
+            // 3. 清空所有記錄
+            setTimeout(() => {
+                allRecords = [];
+                currentObs = createBlankObsItem();
+                saveLocalStorage();
+                renderObservationCard();
+                refreshTable();
+                alert('所有記錄已清空！');
+            }, 1500);
+        }
+
+        // ================================================================
+        // 頁面切換
+        // ================================================================
+        function showPage(pageId) {
+            document.querySelectorAll('.page-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+        function goHome() { showPage('page-home'); }
+        function goToAdmin() { showPage('page-admin'); }
+        function goToSelectObserver() {
+            showPage('page-select-observer');
+            document.querySelectorAll('.observer-option-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('selectedDisplay').textContent = '';
+        }
+        function goToObserver() {
+            showPage('page-observer');
+            if (!currentObs) {
+                currentObs = createBlankObsItem();
+                renderObservationCard();
+                refreshTable();
+            }
+            if (!window._timerStarted) {
+                setInterval(updateTimer, 1000);
+                window._timerStarted = true;
+            }
+        }
+
+        function selectObserver(name) {
+            document.querySelectorAll('.observer-option-btn').forEach(btn => btn.classList.remove('selected'));
+            if (name === 'Other') {
+                document.getElementById('selectedDisplay').textContent = '您選擇了 Other，請在觀察頁自行填寫姓名。';
+                document.getElementById('observerName').value = '';
+                setTimeout(goToObserver, 300);
+                return;
+            }
+            document.querySelectorAll('.observer-option-btn').forEach(btn => {
+                if (btn.textContent.trim() === name) btn.classList.add('selected');
+            });
+            document.getElementById('selectedDisplay').innerHTML = '已選擇：<strong>' + name + '</strong>';
+            document.getElementById('observerName').value = name;
+            localStorage.setItem('selectedObserver', name);
+            setTimeout(goToObserver, 400);
+        }
+
+        // ================================================================
+        // Admin 功能
+        // ================================================================
+        let adminData = [];
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) { parseCSVData(e.target.result); };
+            reader.readAsText(file);
+        }
+
+        function parseCSVData(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            if (lines.length < 2) {
+                alert('CSV 檔案格式不正確，請確保包含標頭列。');
+                return;
+            }
+            const headers = parseCSVLine(lines[0]);
+            const records = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values.length < headers.length) continue;
+                const record = {};
+                headers.forEach((h, idx) => { record[h] = values[idx] ? values[idx].trim() : ''; });
+                records.push(record);
+            }
+            if (records.length === 0) {
+                alert('沒有找到有效數據。');
+                return;
+            }
+            adminData = records;
+            renderAdminDashboard();
+            alert('成功載入 ' + adminData.length + ' 筆記錄！');
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (inQuotes) {
+                    if (char === '"' && (i + 1 < line.length && line[i + 1] === '"')) {
+                        current += '"';
+                        i++;
+                    } else if (char === '"') {
+                        inQuotes = false;
+                    } else {
+                        current += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === ',') {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        function renderAdminDashboard() {
+            const allCases = adminData;
+            const observerMap = {};
+            allCases.forEach(record => {
+                const observer = record.觀察者 || 'Unknown';
+                if (!observerMap[observer]) observerMap[observer] = [];
+                observerMap[observer].push(record);
+            });
+            const totalCases = allCases.length;
+            const totalObservers = Object.keys(observerMap).length;
+            document.getElementById('totalCases').textContent = totalCases;
+            document.getElementById('totalObservers').textContent = totalObservers;
+
+            const grid = document.getElementById('adminObserverGrid');
+            grid.innerHTML = '';
+            const observerNames = Object.keys(observerMap);
+            if (observerNames.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無數據</div>';
+            }
+            observerNames.forEach(name => {
+                const cases = observerMap[name];
+                const card = document.createElement('div');
+                card.className = 'admin-observer-card';
+                card.innerHTML = `
+                    <div class="admin-observer-name">${name}</div>
+                    <div class="admin-observer-stats">
+                        <span><span class="stat-value">${cases.length}</span> <span class="stat-label">總案件</span></span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            const tbody = document.getElementById('adminDetailBody');
+            tbody.innerHTML = '';
+            if (allCases.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
+                return;
+            }
+            const displayCases = allCases.slice(0, 100);
+            displayCases.forEach(record => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${record.觀察者 || '-'}</td>
+                    <td>${record.報案人編號 || '-'}</td>
+                    <td>${record.觀察日期 || '-'}</td>
+                    <td>${record.觀察時段 || '-'}</td>
+                    <td>${record.報案室 || '-'}</td>
+                    <td><span class="status-tag ended">已提交</span></td>
+                    <td>${record.行為動作 ? 1 : 0}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            if (allCases.length > 100) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="7" style="text-align:center;color:var(--neutral-gray-400);">顯示最近 100 筆，共 ${allCases.length} 筆</td>`;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function exportAdminCSV() {
+            if (adminData.length === 0) { alert('沒有數據可匯出！'); return; }
+            const headers = ['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
+            let csvContent = "\uFEFF" + headers.join(",") + "\n";
+            adminData.forEach(rec => {
+                const row = [
+                    rec.觀察者 || '', rec.報案人編號 || '', rec.觀察日期 || '',
+                    rec.觀察時段 || '', rec.報案室 || '', rec.性別 || '',
+                    rec.年齡層 || '', rec.族裔 || '', rec.行為動作 || '',
+                    rec.動作備註 || '', rec.階段歷時 || '', rec.總時長 || '',
+                    rec.記錄時間 || ''
+                ].map(v => `"${String(v).replace(/"/g, '""')}"`);
+                csvContent += row.join(",") + "\n";
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `admin_匯出數據_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function exportAdminExcel() {
+            if (adminData.length === 0) { alert('沒有數據可匯出！'); return; }
+            const data = [];
+            data.push(['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間']);
+            adminData.forEach(rec => {
+                data.push([
+                    rec.觀察者 || '', rec.報案人編號 || '', rec.觀察日期 || '',
+                    rec.觀察時段 || '', rec.報案室 || '', rec.性別 || '',
+                    rec.年齡層 || '', rec.族裔 || '', rec.行為動作 || '',
+                    rec.動作備註 || '', rec.階段歷時 || '', rec.總時長 || '',
+                    rec.記錄時間 || ''
+                ]);
+            });
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            ws['!cols'] = [
+                { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 12 },
+                { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 25 }, { wch: 20 },
+                { wch: 18 }, { wch: 18 }, { wch: 18 }
+            ];
+            XLSX.utils.book_append_sheet(wb, ws, '數據');
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `admin_匯出報告_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        function clearAdminData() {
+            if (adminData.length === 0) return;
+            if (confirm('確定要清除所有已載入的數據嗎？')) {
+                adminData = [];
+                renderAdminDashboard();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+                uploadArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                });
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            parseCSVData(event.target.result);
+                        };
+                        reader.readAsText(files[0]);
+                    } else {
+                        alert('請上傳 CSV 檔案');
+                    }
+                });
+            }
+        });
+
+        // ================================================================
+        // 核心行為記錄功能
+        // ================================================================
+        const actionGroups = [
+            { action: '留意到取票機', group: 'group-1' },
+            { action: '留意到自助服務機', group: 'group-1' },
+            { action: '留意到網上服務', group: 'group-1' },
+            { action: '取票機', group: 'group-2' },
+            { action: '櫃枱', group: 'group-2' },
+            { action: '自助服務機', group: 'group-2' },
+            { action: '等候區', group: 'group-2' },
+            { action: '職員諮詢/指示', group: 'group-3' },
+            { action: '櫃枱接待報案', group: 'group-4' },
+            { action: '完成自助服務機報案', group: 'group-5' },
+            { action: '完成網上服務報案', group: 'group-5' }
+        ];
+
+        let globalDivision = "";
+        let globalPeriod = "";
+        let allRecords = [];
+        let currentObs = null;
+
+        function autoDetectDivision() {
+            if (!navigator.geolocation) return;
+            const divisions = [
+                { name: 'TSTDIV RR', label: 'TSTDIV', lat: 22.2948, lng: 114.1710 },
+                { name: 'MKDIST RR', label: 'MKDIST', lat: 22.3167, lng: 114.1694 },
+                { name: 'YLDIV RR', label: 'YLDIV', lat: 22.4428, lng: 114.0230 },
+                { name: 'TPDIV RR', label: 'TPDIV', lat: 22.4506, lng: 114.1640 }
+            ];
+            function getDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                          Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                return R * c;
+            }
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    let nearest = null;
+                    let minDistance = Infinity;
+                    divisions.forEach(div => {
+                        const dist = getDistance(userLat, userLng, div.lat, div.lng);
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            nearest = div;
+                        }
+                    });
+                    if (nearest) {
+                        const buttons = document.querySelectorAll('#divisionGroup .select-btn');
+                        buttons.forEach(btn => {
+                            if (btn.textContent.trim() === nearest.label) {
+                                btn.click();
+                            }
+                        });
+                    }
+                },
+                function(error) {},
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            );
+        }
+
+        function autoSelectPeriod() {
+            const now = new Date();
+            const hours = now.getHours();
+            let periodName = '';
+            if (hours >= 0 && hours < 12) periodName = 'AM';
+            else if (hours >= 12 && hours < 18) periodName = 'PM';
+            else periodName = 'Evening';
+            const buttons = document.querySelectorAll('#periodGroup .select-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.trim() === periodName) btn.click();
+            });
+        }
+
+        function generateUniqueCaseId() {
+            let prefix = 'TST';
+            if (globalDivision.includes('TST')) prefix = 'TST';
+            else if (globalDivision.includes('MK')) prefix = 'MK';
+            else if (globalDivision.includes('YL')) prefix = 'YL';
+            else if (globalDivision.includes('TP')) prefix = 'TP';
+            let result = '';
+            let isUnique = false;
+            let checkLimit = 0;
+            while (!isUnique && checkLimit < 1000) {
+                const num = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+                result = prefix + num;
+                isUnique = !allRecords.some(r => r.obsIndex === result);
+                checkLimit++;
+            }
+            return result;
+        }
+
+        function createBlankObsItem() {
+            return {
+                id: 'obs_' + Date.now(),
+                caseIndex: generateUniqueCaseId(),
+                isRunning: false,
+                elapsedSeconds: 0,
+                startTime: "",
+                endTime: "",
+                timelineEvents: [],
+                gender: '未選擇',
+                age: '未選擇',
+                ethnicity: '未選擇'
+            };
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('obsDate');
+            if (!dateInput.value) {
+                const today = new Date();
+                dateInput.value = today.getFullYear() + '-' +
+                    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(today.getDate()).padStart(2, '0');
+            }
+            loadLocalStorage();
+            const savedObserver = localStorage.getItem('selectedObserver');
+            if (savedObserver && savedObserver !== 'Other') {
+                document.getElementById('observerName').value = savedObserver;
+            }
+            if (!currentObs) {
+                currentObs = createBlankObsItem();
+            }
+            renderObservationCard();
+            refreshTable();
+            setInterval(updateTimer, 1000);
+            updateRealTimeClock();
+            setTimeout(autoSelectPeriod, 300);
+            setTimeout(autoDetectDivision, 800);
+            showPage('page-home');
+        });
+
+        function selectDivision(name, el) {
+            globalDivision = name;
+            [...el.parentElement.children].forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            saveLocalStorage();
+            syncCurrentObsToAllRecords();
+            refreshTable();
+        }
+
+        function selectPeriod(periodName, el) {
+            globalPeriod = periodName;
+            [...el.parentElement.children].forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            saveLocalStorage();
+            syncCurrentObsToAllRecords();
+            refreshTable();
+        }
+
+        function getCountValues() {
+            const obsCount = parseInt(document.getElementById('observerCount').value) || 0;
+            const staffCount = parseInt(document.getElementById('staffCount').value) || 0;
+            const counterCount = parseInt(document.getElementById('counterCount').value) || 0;
+            return { observerCount: obsCount, staffCount: staffCount, counterCount: counterCount };
+        }
+
+        function renderObservationCard() {
+            const container = document.getElementById('obsContainer');
+            if (!container || !currentObs) return;
+            const obs = currentObs;
+            const statusText = obs.isRunning ? '計時中' : (obs.elapsedSeconds > 0 ? '已暫停' : '未開始');
+            const mins = Math.floor(obs.elapsedSeconds / 60).toString().padStart(2, '0');
+            const secs = (obs.elapsedSeconds % 60).toString().padStart(2, '0');
+            const cardClass = `obs-card ${obs.isRunning ? 'running' : (obs.elapsedSeconds > 0 ? 'paused' : '')}`;
+
+            const hasPending = obs.timelineEvents.some(e => e.isPending);
+            let pendingBannerHtml = "";
+            if (hasPending) {
+                pendingBannerHtml = `
+                    <div class="pending-banner">
+                        <span>目前有候補時間點尚未命名（提示：您可直接在下方「數據匯總表」內打字修改）</span>
+                        <button class="ctrl-btn btn-start" style="padding: 4px 12px; font-size: 12px; background: var(--orange-warning);" onclick="fillPendingName()">彈窗補齊</button>
+                    </div>
+                `;
+            }
+
+            let actionsHtml = actionGroups.map(item => {
+                const act = item.action;
+                const group = item.group;
+                if (act === '櫃枱接待報案') {
+                    const numberBtns = [1, 2, 3, 4, 5].map(num => `
+                        <button class="counter-btn" ${!obs.isRunning ? 'disabled' : ''}
+                                onclick="recordAction('${num}號櫃枱接待報案')"
+                                title="記錄 ${num} 號櫃枱接待報案">${num}</button>
+                    `).join('');
+                    return `
+                        <div class="action-pair ${group}" style="flex-wrap: nowrap;">
+                            <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
+                            <div class="counter-btn-group">${numberBtns}</div>
+                            <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="action-pair ${group}">
+                        <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
+                        <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="${cardClass}" data-id="${obs.id}">
+                    <div class="col-header">
+                        <div class="col-title-wrap">
+                            <span class="col-label">報案人編號：</span>
+                            <input class="case-id-input-small" value="${obs.caseIndex}" onchange="changeCaseId(this)" placeholder="編號">
+                            <span class="col-status">${statusText}</span>
+                        </div>
+                    </div>
+                    <div class="stopwatch-container">
+                        <div class="col-stopwatch">${mins}:${secs}</div>
+                        <div class="col-control-btns">
+                            <button class="ctrl-btn btn-start" ${obs.isRunning ? 'disabled' : ''} onclick="startTimer()">進入報案室 (開始觀察)</button>
+                            <button class="ctrl-btn btn-reset" onclick="resetTimer()">取消記錄</button>
+                        </div>
+                    </div>
+                    <div class="col-timeline-section">
+                        <div class="timeline-info-row">
+                            <span>當前已持續時間：<strong>${mins}:${secs}</strong></span>
+                            <span id="realTimeClock">當前時間：--:--:--</span>
+                            <span>已記錄事件數：<strong id="timeline-count">${obs.timelineEvents.length}</strong></span>
+                        </div>
+                        <div class="timeline-wrap" data-timeline-wrap>
+                            <div class="timeline-track" data-timeline-track></div>
+                            <div class="timeline-now-line" data-timeline-now></div>
+                        </div>
+                        <div class="timeline-note">首個動作為自動起點，其後標示兩動作之間歷時，紅線為當前時間點。</div>
+                    </div>
+                    <h4>行為動作記錄</h4>
+                    <div class="actions-container">
+                        <button class="quick-btn" ${!obs.isRunning ? 'disabled' : ''} onclick="quickMark()">快速記錄當下時間 (後補動作)</button>
+                        ${pendingBannerHtml}
+                        ${actionsHtml}
+                        <div class="custom-action-row">
+                            <input class="custom-action-input" placeholder="輸入其他自訂動作，按 Enter 記錄"
+                                   onkeydown="if(event.key==='Enter')recordCustomAction(this, false)"
+                                   ${!obs.isRunning ? 'disabled' : ''}>
+                            <button class="ctrl-btn btn-reset" style="background:#475569; white-space:nowrap; padding: 0 16px; font-size:13px;"
+                                    ${!obs.isRunning ? 'disabled' : ''}
+                                    onclick="recordCustomAction(document.querySelector('.custom-action-input'), true)">加備註記錄</button>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>報案人表觀特徵</h4>
+                        <div class="trait-grid">
+                            <div class="trait-group">
+                                <strong>性別</strong>
+                                <div class="btn-group">
+                                    <button class="select-btn ${obs.gender==='男'?'active':''}" onclick="setObsTrait('gender', '男', this)">男</button>
+                                    <button class="select-btn ${obs.gender==='女'?'active':''}" onclick="setObsTrait('gender', '女', this)">女</button>
+                                    <button class="select-btn ${obs.gender==='多人'?'active':''}" onclick="setObsTrait('gender', '多人', this)">多人</button>
+                                </div>
+                            </div>
+                            <div class="trait-group">
+                                <strong>年齡層</strong>
+                                <div class="btn-group">
+                                    <button class="select-btn ${obs.age==='30歲以下'?'active':''}" onclick="setObsTrait('age', '30歲以下', this)">30歲以下</button>
+                                    <button class="select-btn ${obs.age==='31-59歲'?'active':''}" onclick="setObsTrait('age', '31-59歲', this)">31-59歲</button>
+                                    <button class="select-btn ${obs.age==='60歲以上'?'active':''}" onclick="setObsTrait('age', '60歲以上', this)">60歲以上</button>
+                                </div>
+                            </div>
+                            <div class="trait-group">
+                                <strong>族裔</strong>
+                                <div class="btn-group">
+                                    <button class="select-btn ${obs.ethnicity==='華裔'?'active':''}" onclick="setObsTrait('ethnicity', '華裔', this)">華裔</button>
+                                    <button class="select-btn ${obs.ethnicity==='非華裔'?'active':''}" onclick="setObsTrait('ethnicity', '非華裔', this)">非華裔</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="submit-section">
+                        <button class="btn-submit" style="background-color: var(--neutral-gray-400);" onclick="submitCurrentObservation()">結束觀察</button>
+                    </div>
+                </div>
+            `;
+            renderTimelineData();
+            updateRealTimeClock();
+        }
+
+        function updateRealTimeClock() {
+            const clock = document.getElementById('realTimeClock');
+            if (clock) {
+                const now = new Date();
+                clock.textContent = `當前時間：${now.toLocaleTimeString('zh-HK', { hour12: false })}`;
+            }
+        }
+
+        function renderTimelineData() {
+            const wrap = document.querySelector('[data-timeline-wrap]');
+            if (!wrap || !currentObs) return;
+            wrap.querySelectorAll('.timeline-dot, .timeline-event').forEach(el => el.remove());
+            const maxSec = Math.max(currentObs.elapsedSeconds, 60);
+            currentObs.timelineEvents.forEach(evt => {
+                let percent = (evt.timestamp / maxSec) * 100;
+                if (percent > 100) percent = 100;
+                let dot = document.createElement('div');
+                dot.className = `timeline-dot ${evt.isPending ? 'pending-dot' : ''}`;
+                dot.style.left = `${percent}%`;
+                wrap.appendChild(dot);
+                let box = document.createElement('div');
+                box.className = `timeline-event ${evt.isPending ? 'pending-event' : ''}`;
+                box.style.left = `${percent}%`;
+                const shortAction = evt.action.length > 8 ? evt.action.substring(0, 8) + '..' : evt.action;
+                box.innerText = evt.isPending ? `候補(${evt.timestamp}s)` : `${shortAction}(${evt.timestamp}s)`;
+                wrap.appendChild(box);
+            });
+        }
+
+        function updateTimer() {
+            if (currentObs && currentObs.isRunning) {
+                currentObs.elapsedSeconds++;
+                const timerDiv = document.querySelector('.col-stopwatch');
+                if (timerDiv) {
+                    const mins = Math.floor(currentObs.elapsedSeconds / 60).toString().padStart(2, '0');
+                    const secs = (currentObs.elapsedSeconds % 60).toString().padStart(2, '0');
+                    timerDiv.innerText = `${mins}:${secs}`;
+                    const timelineInfo = document.querySelector('.col-timeline-section strong');
+                    if (timelineInfo) timelineInfo.innerText = `${mins}:${secs}`;
+                }
+                const nowLine = document.querySelector('[data-timeline-now]');
+                if (nowLine) {
+                    const maxSec = Math.max(currentObs.elapsedSeconds, 60);
+                    let nowPercent = (currentObs.elapsedSeconds / maxSec) * 100;
+                    nowLine.style.left = `${nowPercent > 100 ? 100 : nowPercent}%`;
+                }
+                if (currentObs.elapsedSeconds % 5 === 0) {
+                    saveLocalStorage();
+                }
+            }
+            updateRealTimeClock();
+        }
+
+        function startTimer() {
+            if (!currentObs.startTime) {
+                currentObs.startTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
+            }
+            currentObs.isRunning = true;
+            if (currentObs.timelineEvents.length === 0) {
+                executeAddEvent('進入報案室', '系統自動生成（開始觀察）', false);
+            } else {
+                renderObservationCard();
+                syncCurrentObsToAllRecords();
+                refreshTable();
+            }
+        }
+
+        function resetTimer() {
+            if (confirm("確定要取消當前報案人的所有記錄嗎？(此動作無法復原)")) {
+                allRecords = allRecords.filter(r => r.obsIndex !== currentObs.caseIndex);
+                currentObs = createBlankObsItem();
+                renderObservationCard();
+                refreshTable();
+                saveLocalStorage();
+            }
+        }
+
+        function syncCurrentObsToAllRecords() {
+            if (!currentObs) return;
+            allRecords = allRecords.filter(r => r.obsIndex !== currentObs.caseIndex);
+            const obsName = document.getElementById('observerName').value;
+            const oDate = document.getElementById('obsDate').value;
+            const counts = getCountValues();
+
+            let ethnicityValue = currentObs.ethnicity;
+            if (ethnicityValue === '未選擇' || ethnicityValue === '') {
+                ethnicityValue = '不詳';
+            }
+
+            currentObs.timelineEvents.forEach(evt => {
+                allRecords.push({
+                    obsIndex: currentObs.caseIndex,
+                    observer: obsName,
+                    date: oDate,
+                    period: globalPeriod,
+                    division: globalDivision,
+                    observerCount: counts.observerCount,
+                    staffCount: counts.staffCount,
+                    counterCount: counts.counterCount,
+                    startTime: currentObs.startTime,
+                    endTime: currentObs.endTime,
+                    gender: currentObs.gender,
+                    age: currentObs.age,
+                    ethnicity: ethnicityValue,
+                    action: evt.action,
+                    note: evt.note,
+                    stageDuration: evt.stageDuration,
+                    totalDuration: evt.timestamp,
+                    recordTime: evt.recordTime,
+                    uuid: evt.uuid
+                });
+            });
+            saveLocalStorage();
+        }
+
+        function executeAddEvent(actionName, note = "", isPending = false) {
+            let lastTime = 0;
+            if (currentObs.timelineEvents.length > 0) {
+                lastTime = currentObs.timelineEvents[currentObs.timelineEvents.length - 1].timestamp;
+            }
+            const stageDur = currentObs.elapsedSeconds - lastTime;
+            const newEvent = {
+                uuid: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                timestamp: currentObs.elapsedSeconds,
+                action: actionName,
+                note: note,
+                stageDuration: stageDur,
+                isPending: isPending,
+                recordTime: new Date().toLocaleTimeString('zh-HK', { hour12: false })
+            };
+            currentObs.timelineEvents.push(newEvent);
+            renderObservationCard();
+            syncCurrentObsToAllRecords();
+            refreshTable();
+            // 自動同步到主試算表
+            autoSyncToSheets(false);
+        }
+
+        function recordAction(actName) {
+            executeAddEvent(actName, "", false);
+        }
+
+        function recordActionWithNote(actName) {
+            openCustomModal({
+                title: `為「${actName}」加入動作備註`,
+                placeholder: "請填寫有關此動作的詳細情況（非必填）",
+                showSkip: true,
+                onSave: (noteVal) => {
+                    executeAddEvent(actName, noteVal, false);
+                }
+            });
+        }
+
+        function quickMark() {
+            executeAddEvent("", "", true);
+        }
+
+        function recordCustomAction(inputEl, forceNote) {
+            const val = inputEl.value.trim();
+            if (!val) return;
+            if (forceNote) {
+                openCustomModal({
+                    title: `為自訂動作「${val}」加入備註`,
+                    placeholder: "請填寫對應備註...",
+                    showSkip: true,
+                    onSave: (noteVal) => {
+                        executeAddEvent(val, noteVal, false);
+                        inputEl.value = "";
+                    }
+                });
+            } else {
+                executeAddEvent(val, "", false);
+                inputEl.value = "";
+            }
+        }
+
+        function setObsTrait(trait, val, el) {
+            currentObs[trait] = val;
+            [...el.parentElement.children].forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            syncCurrentObsToAllRecords();
+            refreshTable();
+        }
+
+        function changeCaseId(inputEl) {
+            const newVal = inputEl.value.trim();
+            if (!newVal) {
+                inputEl.value = currentObs.caseIndex;
+                return;
+            }
+            allRecords.forEach(r => {
+                if (r.obsIndex === currentObs.caseIndex) r.obsIndex = newVal;
+            });
+            currentObs.caseIndex = newVal;
+            saveLocalStorage();
+            refreshTable();
+        }
+
+        function updateTableFieldDirectly(uuid, field, val) {
+            const rec = allRecords.find(r => r.uuid === uuid);
+            if (rec) {
+                rec[field] = val;
+                if (field === 'action') {
+                    rec.isPending = false;
+                    if (currentObs) {
+                        const innerEvt = currentObs.timelineEvents.find(e => e.uuid === uuid);
+                        if (innerEvt) {
+                            innerEvt.action = val;
+                            innerEvt.isPending = false;
+                        }
+                    }
+                } else if (field === 'note') {
+                    if (currentObs) {
+                        const innerEvt = currentObs.timelineEvents.find(e => e.uuid === uuid);
+                        if (innerEvt) {
+                            innerEvt.note = val;
+                        }
+                    }
+                }
+            }
+            saveLocalStorage();
+            refreshTable();
+            const banner = document.querySelector('.pending-banner');
+            if (currentObs) {
+                const hasPending = currentObs.timelineEvents.some(e => e.isPending);
+                if (!hasPending && banner) banner.remove();
+                renderTimelineData();
+            }
+        }
+
+        function fillPendingName() {
+            const pEvt = currentObs.timelineEvents.find(e => e.isPending);
+            if (!pEvt) return;
+            openCustomModal({
+                title: `命名候補時間點 (${pEvt.timestamp}秒)`,
+                placeholder: "請填寫此時間點發生的具體行為動作（必填）",
+                showSkip: false,
+                onSave: (val) => {
+                    if (!val.trim()) {
+                        alert('動作名稱不能留空！');
+                        return;
+                    }
+                    pEvt.action = val.trim();
+                    pEvt.isPending = false;
+                    syncCurrentObsToAllRecords();
+                    renderObservationCard();
+                    refreshTable();
+                    setTimeout(() => {
+                        if (currentObs.timelineEvents.some(e => e.isPending)) fillPendingName();
+                    }, 200);
+                }
+            });
+        }
+
+        function submitCurrentObservation() {
+            if (!currentObs || currentObs.timelineEvents.length === 0) {
+                alert('當前個案未有任何行為動作記錄，無法提交！');
+                return;
+            }
+            if (currentObs.timelineEvents.some(e => e.isPending)) {
+                alert('請先補齊所有「候補時間點」的動作名稱再進行結案提交！');
+                return;
+            }
+            if (!confirm('確認結束當前觀察，開始下一個案件嗎？')) return;
+
+            currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
+            currentObs.isRunning = false;
+            syncCurrentObsToAllRecords();
+
+            currentObs = createBlankObsItem();
+            saveLocalStorage();
+            renderObservationCard();
+            refreshTable();
+            alert('已結束觀察，開始下一個案件！');
+        }
+
+        function refreshTable() {
+            const tbody = document.getElementById('data-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            allRecords.forEach(rec => {
+                const tr = document.createElement('tr');
+                const fields = [
+                    { key: 'obsIndex', editable: false },
+                    { key: 'observer', editable: true },
+                    { key: 'date', editable: true },
+                    { key: 'period', editable: true },
+                    { key: 'division', editable: true },
+                    { key: 'observerCount', editable: true, type: 'number' },
+                    { key: 'staffCount', editable: true, type: 'number' },
+                    { key: 'counterCount', editable: true, type: 'number' },
+                    { key: 'startTime', editable: true },
+                    { key: 'endTime', editable: true },
+                    { key: 'gender', editable: true },
+                    { key: 'age', editable: true },
+                    { key: 'ethnicity', editable: true },
+                    { key: 'action', editable: true, isAction: true },
+                    { key: 'note', editable: true, isNote: true },
+                    { key: 'stageDuration', editable: true },
+                    { key: 'totalDuration', editable: true },
+                    { key: 'recordTime', editable: true }
+                ];
+                fields.forEach(f => {
+                    const td = document.createElement('td');
+                    if (f.editable) {
+                        const input = document.createElement('input');
+                        input.type = f.type === 'number' ? 'number' : 'text';
+                        input.className = 'table-input';
+                        if (f.isAction) input.classList.add('action-input');
+                        let value = rec[f.key] !== undefined ? rec[f.key] : '';
+                        if (value === null || value === undefined) value = '';
+                        input.value = value;
+                        input.placeholder = '...';
+                        input.onchange = function() {
+                            let val = this.value;
+                            if (f.type === 'number') {
+                                val = parseInt(val) || 0;
+                            }
+                            updateTableFieldDirectly(rec.uuid, f.key, val);
+                        };
+                        td.appendChild(input);
+                    } else {
+                        td.textContent = rec.obsIndex || '';
+                        td.style.fontWeight = 'bold';
+                        td.style.color = 'var(--police-blue)';
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openCustomModal({ title, placeholder, showSkip, onSave }) {
+            const exist = document.getElementById('dynamicModal');
+            if (exist) exist.remove();
+            const mask = document.createElement('div');
+            mask.className = 'modal-mask';
+            mask.id = 'dynamicModal';
+            mask.innerHTML = `
+                <div class="modal-box">
+                    <div class="modal-title">${title}</div>
+                    <textarea class="modal-textarea" placeholder="${placeholder}"></textarea>
+                    <div class="modal-buttons">
+                        <button class="modal-btn modal-cancel" id="mCancel">取消</button>
+                        ${showSkip ? `<button class="modal-btn modal-skip" id="mSkip">略過備註</button>` : ''}
+                        <button class="modal-btn modal-save" id="mSave">確認儲存</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(mask);
+            const txt = mask.querySelector('.modal-textarea');
+            txt.focus();
+            mask.querySelector('#mCancel').onclick = () => mask.remove();
+            if (showSkip) {
+                mask.querySelector('#mSkip').onclick = () => {
+                    onSave("");
+                    mask.remove();
+                };
+            }
+            mask.querySelector('#mSave').onclick = () => {
+                onSave(txt.value.trim());
+                mask.remove();
+            };
+        }
+
+        function saveLocalStorage() {
+            localStorage.setItem('observerName', document.getElementById('observerName').value);
+            localStorage.setItem('obsDate', document.getElementById('obsDate').value);
+            localStorage.setItem('globalDivision', globalDivision);
+            localStorage.setItem('globalPeriod', globalPeriod);
+            const counts = getCountValues();
+            localStorage.setItem('observerCount', counts.observerCount);
+            localStorage.setItem('staffCount', counts.staffCount);
+            localStorage.setItem('counterCount', counts.counterCount);
+            localStorage.setItem('allRecords', JSON.stringify(allRecords));
+            localStorage.setItem('currentObs', JSON.stringify(currentObs));
+        }
+
+        function loadLocalStorage() {
+            if (localStorage.getItem('observerName')) document.getElementById('observerName').value = localStorage.getItem('observerName');
+            if (localStorage.getItem('obsDate')) document.getElementById('obsDate').value = localStorage.getItem('obsDate');
+            if (localStorage.getItem('observerCount')) document.getElementById('observerCount').value = localStorage.getItem('observerCount');
+            if (localStorage.getItem('staffCount')) document.getElementById('staffCount').value = localStorage.getItem('staffCount');
+            if (localStorage.getItem('counterCount')) document.getElementById('counterCount').value = localStorage.getItem('counterCount');
+            globalDivision = localStorage.getItem('globalDivision') || "";
+            globalPeriod = localStorage.getItem('globalPeriod') || "";
+            document.querySelectorAll('#divisionGroup .select-btn').forEach(b => {
+                if (b.getAttribute('onclick').includes(`'${globalDivision}'`)) b.classList.add('active');
+            });
+            document.querySelectorAll('#periodGroup .select-btn').forEach(b => {
+                if (b.getAttribute('onclick').includes(`'${globalPeriod}'`)) b.classList.add('active');
+            });
+            allRecords = JSON.parse(localStorage.getItem('allRecords')) || [];
+            if (localStorage.getItem('currentObs')) {
+                currentObs = JSON.parse(localStorage.getItem('currentObs'));
+            }
+        }
+
+        function exportCSV() {
+            if (allRecords.length === 0) {
+                alert('當前數據庫中沒有任何資料可供匯出！');
+                return;
+            }
+            const headers = ['報案人編號', '觀察者', '觀察日期', '觀察時段', '報案室', '觀察員數目', '職員數目', '開放櫃枱數目', '開始時間', '結束時間', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
+            let csvContent = "\uFEFF" + headers.join(",") + "\n";
+            allRecords.forEach(rec => {
+                const row = [
+                    rec.obsIndex, rec.observer || '', rec.date || '',
+                    rec.period || '', rec.division || '',
+                    rec.observerCount !== undefined ? rec.observerCount : '',
+                    rec.staffCount !== undefined ? rec.staffCount : '',
+                    rec.counterCount !== undefined ? rec.counterCount : '',
+                    rec.startTime || '', rec.endTime || '',
+                    rec.gender, rec.age, rec.ethnicity,
+                    rec.action, rec.note || '',
+                    rec.stageDuration, rec.totalDuration, rec.recordTime
+                ].map(v => `"${String(v).replace(/"/g, '""')}"`);
+                csvContent += row.join(",") + "\n";
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `報案室觀察數據匯總_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function removeEmoji(str) {
+            if (!str) return '';
+            return str.replace(/[\p{Emoji}\u{FE0F}]/gu, '').trim();
+        }
+
+        function exportExcel() {
+            if (allRecords.length === 0) {
+                alert('無任何數據可匯出！');
+                return;
+            }
+            const groups = {};
+            allRecords.forEach(rec => {
+                if (!groups[rec.obsIndex]) groups[rec.obsIndex] = [];
+                groups[rec.obsIndex].push(rec);
+            });
+            const wb = XLSX.utils.book_new();
+            for (const [obsIndex, records] of Object.entries(groups)) {
+                records.sort((a, b) => (a.recordTime || '').localeCompare(b.recordTime || ''));
+                const first = records[0];
+                const data = [];
+                data.push(['觀察者姓名：', first.observer || '']);
+                data.push(['日期：', first.date || '', '時段：', first.period || '', '報案室：', first.division || '']);
+                data.push(['觀察開始時間：', first.startTime || '', '觀察完成時間：', first.endTime || '']);
+                data.push(['觀察員數目：', first.observerCount || '', '職員數目：', first.staffCount || '', '開放櫃枱數目：', first.counterCount || '']);
+                data.push([]);
+                data.push(['報案人編號：', obsIndex, '性別：', first.gender || '', '年齡：', first.age || '', '族裔：', first.ethnicity || '']);
+                data.push([]);
+                data.push(['日期', '記錄時間', '行為動作', '階段歷時(秒)', '總時長(秒)', '備註']);
+                records.forEach(rec => {
+                    data.push([
+                        rec.date || '',
+                        rec.recordTime || '',
+                        removeEmoji(rec.action || ''),
+                        rec.stageDuration !== undefined ? rec.stageDuration : '',
+                        rec.totalDuration !== undefined ? rec.totalDuration : '',
+                        rec.note || ''
+                    ]);
+                });
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                ws['!cols'] = [
+                    { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 18 }, { wch: 18 }, { wch: 25 }
+                ];
+                let sheetName = obsIndex.replace(/[\\:*?/\[\]]/g, '').substring(0, 31);
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            }
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `報案室觀察報告_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+    </script>
+</body>
+</html>
