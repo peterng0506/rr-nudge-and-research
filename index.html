@@ -1198,7 +1198,7 @@
             <div class="admin-subtitle">觀察員填寫進度總覽</div>
             <div class="admin-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                 <div class="icon">📤</div>
-                <div class="text">拖曳 <strong>CSV 檔案</strong> 到這裡，或點擊上傳</div>
+                <div class="text">拖曳 CSV 檔案 到這裡，或點擊上傳</div>
                 <div class="sub-text">支援從 Google Sheets 下載的 CSV 檔案</div>
                 <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleFileUpload(event)">
             </div>
@@ -1313,8 +1313,8 @@
                 </table>
             </div>
             <div class="table-btn-group">
-                <button class="upload-btn" onclick="uploadToCloud()">☁️ 上傳至雲端</button>
-                <button class="clear-btn" onclick="clearAllRecordsWithDownload()">🗑️ 清空全部記錄</button>
+                <button class="upload-btn" onclick="uploadToCloud()">上傳至雲端</button>
+                <button class="clear-btn" onclick="clearAllRecordsWithDownload()">清空全部記錄</button>
             </div>
         </div>
     </div>
@@ -1324,12 +1324,12 @@
     <!-- ============================================================ -->
     <script>
         // ================================================================
-        // Google Sheets 設定（請填入您的網址）
+        // Google Sheets 設定
         // ================================================================
         // 即時同步網址（原有試算表）
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzIiEkr0yLeugZKkTe9f-6Ph7_R94lHaxnbyFhTLCuYIQ1n9VhfH_gWOiZteh5cdVlD-w/exec';
-        // 個人報告網址（Personal Record Report - Admin）
-        const PERSONAL_REPORT_URL = 'https://script.google.com/macros/s/你的個人報告網址/exec';
+        // 個人報告網址（暫時空置，待您提供）
+        const PERSONAL_REPORT_URL = '';  // 待填
 
         // ================================================================
         // 自動同步函數（每次記錄動作時自動觸發）
@@ -1377,9 +1377,9 @@
             })
             .then(response => response.json())
             .then(result => {
-                if (result.success) console.log('✅ 同步成功，共 ' + result.count + ' 筆');
+                if (result.success) console.log('同步成功，共 ' + result.count + ' 筆');
             })
-            .catch(error => console.error('❌ 同步錯誤:', error));
+            .catch(error => console.error('同步錯誤:', error));
         }
 
         // ================================================================
@@ -1399,40 +1399,44 @@
             // 1. 上傳到主試算表
             sendToGoogleSheets(allRecords);
 
-            // 2. 上傳個人報告
-            const observer = document.getElementById('observerName').value || '未填寫';
-            const date = document.getElementById('obsDate').value || '未填寫';
-            const period = globalPeriod || '未選擇';
-            const division = globalDivision || '未選擇';
-            const counts = getCountValues();
+            // 2. 上傳個人報告（如果網址已設定）
+            if (PERSONAL_REPORT_URL && PERSONAL_REPORT_URL.trim() !== '') {
+                const observer = document.getElementById('observerName').value || '未填寫';
+                const date = document.getElementById('obsDate').value || '未填寫';
+                const period = globalPeriod || '未選擇';
+                const division = globalDivision || '未選擇';
+                const counts = getCountValues();
 
-            const endedRecords = allRecords.filter(rec => rec.endTime);
-            if (endedRecords.length > 0 && !PERSONAL_REPORT_URL.includes('你的個人報告網址')) {
-                const recordsToSubmit = endedRecords.map(rec => ({
-                    observer: observer, date: date, period: period, division: division,
-                    observerCount: counts.observerCount, staffCount: counts.staffCount,
-                    counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
-                    gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
-                    action: rec.action || '', note: rec.note || '',
-                    stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
-                    recordTime: rec.recordTime
-                }));
+                const endedRecords = allRecords.filter(rec => rec.endTime);
+                if (endedRecords.length > 0) {
+                    const recordsToSubmit = endedRecords.map(rec => ({
+                        observer: observer, date: date, period: period, division: division,
+                        observerCount: counts.observerCount, staffCount: counts.staffCount,
+                        counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
+                        gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
+                        action: rec.action || '', note: rec.note || '',
+                        stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
+                        recordTime: rec.recordTime
+                    }));
 
-                fetch(PERSONAL_REPORT_URL, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(recordsToSubmit)
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) console.log('✅ 個人報告上傳成功，共 ' + result.count + ' 筆');
-                })
-                .catch(error => console.error('❌ 個人報告上傳錯誤:', error));
+                    fetch(PERSONAL_REPORT_URL, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(recordsToSubmit)
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) console.log('個人報告上傳成功，共 ' + result.count + ' 筆');
+                    })
+                    .catch(error => console.error('個人報告上傳錯誤:', error));
+                }
+            } else {
+                console.log('個人報告網址未設定，跳過上傳');
             }
 
             setTimeout(() => {
                 btn.textContent = originalText;
                 btn.disabled = false;
-                alert('✅ 數據已成功上傳至雲端！');
+                alert('數據已成功上傳至雲端！');
             }, 1500);
         }
 
@@ -1445,7 +1449,7 @@
                 return;
             }
 
-            if (!confirm('⚠️ 確定要下載並清空所有記錄嗎？\n\n此操作將：\n1. 下載 CSV 檔案\n2. 下載 Excel 報告\n3. 清空所有本地記錄\n\n此操作無法復原！')) {
+            if (!confirm('確定要下載並清空所有記錄嗎？\n\n此操作將：\n1. 下載 CSV 檔案\n2. 下載 Excel 報告\n3. 清空所有本地記錄\n\n此操作無法復原！')) {
                 return;
             }
 
@@ -1464,7 +1468,7 @@
                 saveLocalStorage();
                 renderObservationCard();
                 refreshTable();
-                alert('✅ 所有記錄已清空！');
+                alert('所有記錄已清空！');
             }, 1500);
         }
 
@@ -2272,7 +2276,7 @@
             });
         }
 
-        // ===== 修改：結束觀察只負責結束，不上傳 =====
+        // ===== 結束觀察只負責結束，不上傳 =====
         function submitCurrentObservation() {
             if (!currentObs || currentObs.timelineEvents.length === 0) {
                 alert('當前個案未有任何行為動作記錄，無法提交！');
@@ -2284,17 +2288,15 @@
             }
             if (!confirm('確認結束當前觀察，開始下一個案件嗎？')) return;
 
-            // 只記錄結束時間，不上傳任何數據
             currentObs.endTime = new Date().toLocaleTimeString('zh-HK', { hour12: false });
             currentObs.isRunning = false;
             syncCurrentObsToAllRecords();
 
-            // 產生新個案
             currentObs = createBlankObsItem();
             saveLocalStorage();
             renderObservationCard();
             refreshTable();
-            alert('✅ 已結束觀察，開始下一個案件！');
+            alert('已結束觀察，開始下一個案件！');
         }
 
         function refreshTable() {
