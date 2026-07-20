@@ -1326,10 +1326,8 @@
         // ================================================================
         // Google Sheets 設定
         // ================================================================
-        // 即時同步網址（原有試算表）
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzIiEkr0yLeugZKkTe9f-6Ph7_R94lHaxnbyFhTLCuYIQ1n9VhfH_gWOiZteh5cdVlD-w/exec';
-        // 個人報告網址（暫時空置，待您提供）
-        const PERSONAL_REPORT_URL = '';  // 待填
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzBfqGZX5G5qeuI3_yvpknyAx-6CEmz5js9O8FEygANZhAPS3jkx9HXIDd1xdMK_LOg/exec';
+        const PERSONAL_REPORT_URL = 'https://script.google.com/macros/s/AKfycbwZf8XfVJBL84vTwQQelH9BlZVjyxs-aIyuPmMoNRkJm71-LAqkwYryAnk77XLMJmFmKw/exec';
 
         // ================================================================
         // 自動同步函數（每次記錄動作時自動觸發）
@@ -1399,38 +1397,34 @@
             // 1. 上傳到主試算表
             sendToGoogleSheets(allRecords);
 
-            // 2. 上傳個人報告（如果網址已設定）
-            if (PERSONAL_REPORT_URL && PERSONAL_REPORT_URL.trim() !== '') {
-                const observer = document.getElementById('observerName').value || '未填寫';
-                const date = document.getElementById('obsDate').value || '未填寫';
-                const period = globalPeriod || '未選擇';
-                const division = globalDivision || '未選擇';
-                const counts = getCountValues();
+            // 2. 上傳個人報告
+            const observer = document.getElementById('observerName').value || '未填寫';
+            const date = document.getElementById('obsDate').value || '未填寫';
+            const period = globalPeriod || '未選擇';
+            const division = globalDivision || '未選擇';
+            const counts = getCountValues();
 
-                const endedRecords = allRecords.filter(rec => rec.endTime);
-                if (endedRecords.length > 0) {
-                    const recordsToSubmit = endedRecords.map(rec => ({
-                        observer: observer, date: date, period: period, division: division,
-                        observerCount: counts.observerCount, staffCount: counts.staffCount,
-                        counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
-                        gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
-                        action: rec.action || '', note: rec.note || '',
-                        stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
-                        recordTime: rec.recordTime
-                    }));
+            const endedRecords = allRecords.filter(rec => rec.endTime);
+            if (endedRecords.length > 0) {
+                const recordsToSubmit = endedRecords.map(rec => ({
+                    observer: observer, date: date, period: period, division: division,
+                    observerCount: counts.observerCount, staffCount: counts.staffCount,
+                    counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
+                    gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
+                    action: rec.action || '', note: rec.note || '',
+                    stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
+                    recordTime: rec.recordTime
+                }));
 
-                    fetch(PERSONAL_REPORT_URL, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(recordsToSubmit)
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) console.log('個人報告上傳成功，共 ' + result.count + ' 筆');
-                    })
-                    .catch(error => console.error('個人報告上傳錯誤:', error));
-                }
-            } else {
-                console.log('個人報告網址未設定，跳過上傳');
+                fetch(PERSONAL_REPORT_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(recordsToSubmit)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) console.log('個人報告上傳成功，共 ' + result.count + ' 筆');
+                })
+                .catch(error => console.error('個人報告上傳錯誤:', error));
             }
 
             setTimeout(() => {
@@ -2276,7 +2270,6 @@
             });
         }
 
-        // ===== 結束觀察只負責結束，不上傳 =====
         function submitCurrentObservation() {
             if (!currentObs || currentObs.timelineEvents.length === 0) {
                 alert('當前個案未有任何行為動作記錄，無法提交！');
