@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Room Nudge & Research</title>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report Room Nudge · GitHub 版本</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+    </script>
     <style>
+        /* ===== 原有樣式 (保持不變) ===== */
         :root {
             --police-blue: #00205B;
             --police-light-blue: #0038A8;
@@ -20,17 +22,21 @@
             --orange-warning: #F59E0B;
             --orange-bg: #FFFBEB;
             --danger-bg: #FEE2E2;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 3px 8px rgba(0,0,0,0.09);
-            --shadow-lg: 0 6px 16px rgba(0,0,0,0.12);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.09);
+            --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.12);
             --radius-sm: 6px;
             --radius-md: 12px;
             --transition-fast: all 0.2s ease-in-out;
             --google-blue: #4285F4;
             --upload-green: #2E7D32;
             --clear-red: #C62828;
+            --github-dark: #24292e;
+            --github-blue: #0366d6;
         }
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
         body {
             font-family: Arial, "Microsoft JhengHei", "Noto Sans TC", sans-serif;
             background-color: var(--neutral-gray-50);
@@ -54,7 +60,9 @@
             font-weight: 600;
             color: var(--neutral-gray-800);
         }
-        .required { color: var(--warning-red); }
+        .required {
+            color: var(--warning-red);
+        }
         .tip-text {
             font-size: 12px;
             color: var(--neutral-gray-300);
@@ -134,7 +142,9 @@
             cursor: pointer;
             transition: var(--transition-fast);
         }
-        .select-btn:hover:not(.active) { background-color: var(--neutral-gray-100); }
+        .select-btn:hover:not(.active) {
+            background-color: var(--neutral-gray-100);
+        }
         .select-btn.active {
             background-color: var(--police-light-blue);
             color: white;
@@ -257,8 +267,14 @@
             cursor: not-allowed;
             filter: grayscale(50%);
         }
-        .btn-start { background: var(--success-green); color: #fff; }
-        .btn-reset { background: #64748B; color: #fff; }
+        .btn-start {
+            background: var(--success-green);
+            color: #fff;
+        }
+        .btn-reset {
+            background: #64748B;
+            color: #fff;
+        }
         .col-timeline-section {
             margin-bottom: 20px;
             padding-bottom: 16px;
@@ -370,32 +386,101 @@
         .action-pair:hover {
             border-color: var(--police-light-blue);
         }
-        .action-pair.group-1 { background: #E3F2FD; border-color: #64B5F6; }
-        .action-pair.group-1 .action-btn-main { background: #E3F2FD; color: #0D47A1; }
-        .action-pair.group-1 .action-btn-main:hover:not(:disabled) { background: #BBDEFB; }
-        .action-pair.group-1 .action-btn-note { background: #1976D2; color: #fff; border-left-color: #64B5F6; }
-        .action-pair.group-1 .action-btn-note:hover:not(:disabled) { background: #0D47A1; }
-        .action-pair.group-2 { background: #E8F5E9; border-color: #81C784; }
-        .action-pair.group-2 .action-btn-main { background: #E8F5E9; color: #1B5E20; }
-        .action-pair.group-2 .action-btn-main:hover:not(:disabled) { background: #C8E6C9; }
-        .action-pair.group-2 .action-btn-note { background: #388E3C; color: #fff; border-left-color: #81C784; }
-        .action-pair.group-2 .action-btn-note:hover:not(:disabled) { background: #1B5E20; }
-        .action-pair.group-3 { background: #FFF3E0; border-color: #FFB74D; }
-        .action-pair.group-3 .action-btn-main { background: #FFF3E0; color: #E65100; }
-        .action-pair.group-3 .action-btn-main:hover:not(:disabled) { background: #FFE0B2; }
-        .action-pair.group-3 .action-btn-note { background: #F57C00; color: #fff; border-left-color: #FFB74D; }
-        .action-pair.group-3 .action-btn-note:hover:not(:disabled) { background: #E65100; }
-        .action-pair.group-4 { background: #F3E5F5; border-color: #BA68C8; }
-        .action-pair.group-4 .action-btn-main { background: #F3E5F5; color: #4A148C; }
-        .action-pair.group-4 .action-btn-main:hover:not(:disabled) { background: #E1BEE7; }
-        .action-pair.group-4 .action-btn-note { background: #7B1FA2; color: #fff; border-left-color: #BA68C8; }
-        .action-pair.group-4 .action-btn-note:hover:not(:disabled) { background: #4A148C; }
-        .action-pair.group-5 { background: #E0F7FA; border-color: #4DD0E1; }
-        .action-pair.group-5 .action-btn-main { background: #E0F7FA; color: #006064; }
-        .action-pair.group-5 .action-btn-main:hover:not(:disabled) { background: #B2EBF2; }
-        .action-pair.group-5 .action-btn-note { background: #00838F; color: #fff; border-left-color: #4DD0E1; }
-        .action-pair.group-5 .action-btn-note:hover:not(:disabled) { background: #006064; }
-
+        .action-pair.group-1 {
+            background: #E3F2FD;
+            border-color: #64B5F6;
+        }
+        .action-pair.group-1 .action-btn-main {
+            background: #E3F2FD;
+            color: #0D47A1;
+        }
+        .action-pair.group-1 .action-btn-main:hover:not(:disabled) {
+            background: #BBDEFB;
+        }
+        .action-pair.group-1 .action-btn-note {
+            background: #1976D2;
+            color: #fff;
+            border-left-color: #64B5F6;
+        }
+        .action-pair.group-1 .action-btn-note:hover:not(:disabled) {
+            background: #0D47A1;
+        }
+        .action-pair.group-2 {
+            background: #E8F5E9;
+            border-color: #81C784;
+        }
+        .action-pair.group-2 .action-btn-main {
+            background: #E8F5E9;
+            color: #1B5E20;
+        }
+        .action-pair.group-2 .action-btn-main:hover:not(:disabled) {
+            background: #C8E6C9;
+        }
+        .action-pair.group-2 .action-btn-note {
+            background: #388E3C;
+            color: #fff;
+            border-left-color: #81C784;
+        }
+        .action-pair.group-2 .action-btn-note:hover:not(:disabled) {
+            background: #1B5E20;
+        }
+        .action-pair.group-3 {
+            background: #FFF3E0;
+            border-color: #FFB74D;
+        }
+        .action-pair.group-3 .action-btn-main {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+        .action-pair.group-3 .action-btn-main:hover:not(:disabled) {
+            background: #FFE0B2;
+        }
+        .action-pair.group-3 .action-btn-note {
+            background: #F57C00;
+            color: #fff;
+            border-left-color: #FFB74D;
+        }
+        .action-pair.group-3 .action-btn-note:hover:not(:disabled) {
+            background: #E65100;
+        }
+        .action-pair.group-4 {
+            background: #F3E5F5;
+            border-color: #BA68C8;
+        }
+        .action-pair.group-4 .action-btn-main {
+            background: #F3E5F5;
+            color: #4A148C;
+        }
+        .action-pair.group-4 .action-btn-main:hover:not(:disabled) {
+            background: #E1BEE7;
+        }
+        .action-pair.group-4 .action-btn-note {
+            background: #7B1FA2;
+            color: #fff;
+            border-left-color: #BA68C8;
+        }
+        .action-pair.group-4 .action-btn-note:hover:not(:disabled) {
+            background: #4A148C;
+        }
+        .action-pair.group-5 {
+            background: #E0F7FA;
+            border-color: #4DD0E1;
+        }
+        .action-pair.group-5 .action-btn-main {
+            background: #E0F7FA;
+            color: #006064;
+        }
+        .action-pair.group-5 .action-btn-main:hover:not(:disabled) {
+            background: #B2EBF2;
+        }
+        .action-pair.group-5 .action-btn-note {
+            background: #00838F;
+            color: #fff;
+            border-left-color: #4DD0E1;
+        }
+        .action-pair.group-5 .action-btn-note:hover:not(:disabled) {
+            background: #006064;
+        }
         .action-btn-main {
             flex: 1;
             padding: 8px 12px;
@@ -416,7 +501,7 @@
         .action-btn-note {
             padding: 0 12px;
             border: none;
-            border-left: 1px solid rgba(0,0,0,0.1);
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
@@ -437,7 +522,6 @@
         .action-btn-note:hover:not(:disabled) {
             filter: brightness(0.9);
         }
-
         .counter-btn-group {
             display: flex;
             align-items: center;
@@ -471,7 +555,6 @@
             opacity: 0.4;
             cursor: not-allowed;
         }
-
         .quick-btn {
             grid-column: 1 / -1;
             padding: 12px;
@@ -485,8 +568,13 @@
             text-align: center;
             transition: var(--transition-fast);
         }
-        .quick-btn:hover:not(:disabled) { background: #FEF3C7; }
-        .quick-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .quick-btn:hover:not(:disabled) {
+            background: #FEF3C7;
+        }
+        .quick-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .custom-action-row {
             grid-column: 1 / -1;
             display: flex;
@@ -569,7 +657,8 @@
             border-collapse: collapse;
             font-size: 13px;
         }
-        th, td {
+        th,
+        td {
             border: 1px solid var(--neutral-gray-200);
             padding: 6px;
             text-align: left;
@@ -580,9 +669,16 @@
             font-weight: 600;
             white-space: nowrap;
         }
-        tbody tr:nth-child(even) { background-color: var(--neutral-gray-50); }
-        tbody tr:hover { background-color: rgba(0, 56, 168, 0.04); }
-        .time-cell { font-weight:700; color:var(--warning-red); }
+        tbody tr:nth-child(even) {
+            background-color: var(--neutral-gray-50);
+        }
+        tbody tr:hover {
+            background-color: rgba(0, 56, 168, 0.04);
+        }
+        .time-cell {
+            font-weight: 700;
+            color: var(--warning-red);
+        }
         .table-input {
             width: 100%;
             min-width: 60px;
@@ -611,7 +707,7 @@
             gap: 12px;
             margin-top: 16px;
         }
-        .upload-btn, .clear-btn {
+        .clear-btn {
             flex: 1;
             min-width: 180px;
             padding: 12px;
@@ -622,15 +718,6 @@
             cursor: pointer;
             transition: var(--transition-fast);
             text-align: center;
-        }
-        .upload-btn {
-            background-color: var(--upload-green);
-            color: white;
-        }
-        .upload-btn:hover {
-            background-color: #1B5E20;
-        }
-        .clear-btn {
             background-color: var(--clear-red);
             color: white;
         }
@@ -640,7 +727,7 @@
         .modal-mask {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -649,8 +736,12 @@
             animation: fadeIn 0.2s ease-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
         .modal-box {
             background: #fff;
@@ -663,8 +754,12 @@
             animation: scaleUp 0.2s ease-out;
         }
         @keyframes scaleUp {
-            from { transform: scale(0.95); }
-            to { transform: scale(1); }
+            from {
+                transform: scale(0.95);
+            }
+            to {
+                transform: scale(1);
+            }
         }
         .modal-title {
             font-size: 18px;
@@ -705,12 +800,30 @@
             min-width: 90px;
             transition: var(--transition-fast);
         }
-        .modal-save { background: var(--police-light-blue); color: white; }
-        .modal-save:hover { background: var(--police-blue); }
-        .modal-skip { background: var(--neutral-gray-200); color: #1E293B; }
-        .modal-skip:hover { background: var(--neutral-gray-300); }
-        .modal-cancel { background: var(--danger-bg); color: var(--warning-red); border: 1px solid var(--warning-red); margin-right: auto; }
-        .modal-cancel:hover { background: var(--warning-red); color: white; }
+        .modal-save {
+            background: var(--police-light-blue);
+            color: white;
+        }
+        .modal-save:hover {
+            background: var(--police-blue);
+        }
+        .modal-skip {
+            background: var(--neutral-gray-200);
+            color: #1E293B;
+        }
+        .modal-skip:hover {
+            background: var(--neutral-gray-300);
+        }
+        .modal-cancel {
+            background: var(--danger-bg);
+            color: var(--warning-red);
+            border: 1px solid var(--warning-red);
+            margin-right: auto;
+        }
+        .modal-cancel:hover {
+            background: var(--warning-red);
+            color: white;
+        }
         .privacy-banner {
             background-color: var(--orange-bg);
             color: #B45309;
@@ -740,6 +853,7 @@
             text-align: center;
             box-shadow: var(--shadow-lg);
             margin-top: 40px;
+            position: relative;
         }
         .home-title {
             font-size: 32px;
@@ -787,6 +901,55 @@
         }
         .home-btn.admin:hover {
             background-color: #475569;
+        }
+        .home-btn.github-btn {
+            background-color: var(--github-dark);
+        }
+        .home-btn.github-btn:hover {
+            background-color: #1a1e23;
+        }
+
+        .github-corner {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+        }
+        .github-corner svg {
+            fill: var(--github-dark);
+            color: #fff;
+            position: absolute;
+            top: 0;
+            right: 0;
+            border: 0;
+        }
+        .github-corner .octo-arm {
+            transform-origin: 130px 106px;
+        }
+        .github-corner:hover .octo-arm {
+            animation: octocat-wave 560ms ease-in-out;
+        }
+        @keyframes octocat-wave {
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+            20%,
+            60% {
+                transform: rotate(-25deg);
+            }
+            40%,
+            80% {
+                transform: rotate(10deg);
+            }
+        }
+        @media (max-width: 500px) {
+            .github-corner:hover .octo-arm {
+                animation: none;
+            }
+            .github-corner .octo-arm {
+                animation: octocat-wave 560ms ease-in-out;
+            }
         }
 
         .select-observer-wrapper {
@@ -1037,7 +1200,8 @@
             border-collapse: collapse;
             font-size: 13px;
         }
-        .admin-table-wrap th, .admin-table-wrap td {
+        .admin-table-wrap th,
+        .admin-table-wrap td {
             border: 1px solid var(--neutral-gray-200);
             padding: 8px 12px;
             text-align: left;
@@ -1080,8 +1244,171 @@
             margin-top: 8px;
         }
 
+        /* ===== GitHub 同步列 ===== */
+        .github-sync-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f6f8fa;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--neutral-gray-200);
+            margin-bottom: 16px;
+        }
+        .github-sync-bar .status {
+            font-size: 13px;
+            color: var(--neutral-gray-400);
+            flex: 1;
+            min-width: 120px;
+        }
+        .github-sync-bar .status strong {
+            color: var(--github-dark);
+        }
+        .github-sync-bar .status .synced {
+            color: var(--success-green);
+        }
+        .github-sync-bar .status .unsynced {
+            color: var(--orange-warning);
+        }
+        .github-btn-sm {
+            padding: 6px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            background: var(--github-dark);
+            color: #fff;
+        }
+        .github-btn-sm:hover:not(:disabled) {
+            background: #1a1e23;
+            transform: translateY(-1px);
+        }
+        .github-btn-sm:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .github-btn-sm.outline {
+            background: transparent;
+            color: var(--github-dark);
+            border: 1px solid var(--github-dark);
+        }
+        .github-btn-sm.outline:hover:not(:disabled) {
+            background: var(--github-dark);
+            color: #fff;
+        }
+        .github-btn-sm.green {
+            background: var(--success-green);
+        }
+        .github-btn-sm.green:hover:not(:disabled) {
+            background: #1B5E20;
+        }
+        .github-btn-sm.danger {
+            background: var(--clear-red);
+        }
+        .github-btn-sm.danger:hover:not(:disabled) {
+            background: #B71C1C;
+        }
+        .github-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            background: #e1e4e8;
+            color: #24292e;
+        }
+        .github-badge.connected {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .github-badge.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* ===== GitHub 設定面板 ===== */
+        .github-settings-panel {
+            background: #fff;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+            display: none;
+        }
+        .github-settings-panel.open {
+            display: block;
+        }
+        .github-settings-panel .setting-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        .github-settings-panel .setting-row label {
+            min-width: 100px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--neutral-gray-800);
+        }
+        .github-settings-panel .setting-row input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid var(--neutral-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition-fast);
+        }
+        .github-settings-panel .setting-row input:focus {
+            outline: none;
+            border-color: var(--police-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+        }
+        .github-settings-panel .setting-row .hint {
+            font-size: 12px;
+            color: var(--neutral-gray-400);
+            flex-basis: 100%;
+            margin-top: -4px;
+        }
+        .github-settings-panel .setting-row .hint a {
+            color: var(--github-blue);
+            text-decoration: none;
+        }
+        .github-settings-panel .setting-row .hint a:hover {
+            text-decoration: underline;
+        }
+        .github-settings-panel .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-settings-btn {
+            background: transparent;
+            border: none;
+            color: var(--github-blue);
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-fast);
+        }
+        .toggle-settings-btn:hover {
+            background: #f0f6ff;
+        }
+
         @media (max-width: 480px) {
-            .home-wrapper, .select-observer-wrapper, .admin-wrapper {
+            .home-wrapper,
+            .select-observer-wrapper,
+            .admin-wrapper {
                 padding: 30px 20px;
             }
             .home-title {
@@ -1119,7 +1446,8 @@
             .action-pair {
                 min-height: 44px;
             }
-            .action-btn-main, .action-btn-note {
+            .action-btn-main,
+            .action-btn-note {
                 min-height: 44px;
                 font-size: 12px;
                 padding: 6px 10px;
@@ -1134,9 +1462,28 @@
             .table-btn-group button {
                 width: 100%;
             }
+            .github-sync-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .github-sync-bar .status {
+                text-align: center;
+            }
+            .github-settings-panel .setting-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .github-settings-panel .setting-row label {
+                min-width: auto;
+            }
+            .github-settings-panel .setting-row input {
+                min-width: auto;
+            }
         }
         @media (max-width: 768px) {
-            .home-wrapper, .select-observer-wrapper, .admin-wrapper {
+            .home-wrapper,
+            .select-observer-wrapper,
+            .admin-wrapper {
                 padding: 40px 24px;
             }
             .home-title {
@@ -1153,22 +1500,68 @@
     <!-- ===== 首頁 ===== -->
     <div id="page-home" class="page-container active">
         <div class="privacy-banner">
-            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+            🔒 保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
         </div>
         <div class="home-wrapper">
+            <!-- GitHub Corner 角標 -->
+            <a href="https://github.com/your-username/report-room-observation" class="github-corner" aria-label="View source on GitHub" target="_blank">
+                <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#24292e; color:#fff; position:absolute; top:0; right:0; border:0;" aria-hidden="true">
+                    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+                    <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+                    <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+                </svg>
+            </a>
             <div class="home-title">Report Room Nudge &amp; Research</div>
-            <div class="home-subtitle">報案室行為觀察系統</div>
+            <div class="home-subtitle">報案室行為觀察系統 · <span style="color:var(--github-dark);font-weight:600;">GitHub 版本</span></div>
             <div class="home-buttons">
                 <button class="home-btn admin" onclick="goToAdmin()">Administrator</button>
                 <button class="home-btn observer" onclick="goToSelectObserver()">Observer</button>
+                <button class="home-btn github-btn" onclick="toggleGitHubSettings()">⚙️ GitHub 設定</button>
             </div>
+            <div style="margin-top: 24px; font-size: 13px; color: var(--neutral-gray-400);">
+                <span class="github-badge" id="githubStatusBadge">未連接</span>
+                <span style="margin-left:12px;" id="githubLastSync">上次同步：--</span>
+            </div>
+        </div>
+
+        <!-- ===== GitHub 設定面板 ===== -->
+        <div class="github-settings-panel" id="githubSettingsPanel">
+            <h4 style="margin-top:0;color:var(--github-dark);">🔗 GitHub Gist 同步設定</h4>
+            <p style="font-size:13px;color:var(--neutral-gray-400);margin-bottom:16px;">
+                使用 GitHub Gist 作為雲端數據備份，實現多設備同步。
+                請建立一個 <strong>公開或私密 Gist</strong>，並填入以下資訊。
+            </p>
+            <div class="setting-row">
+                <label>Gist ID</label>
+                <input type="text" id="gistIdInput" placeholder="例如：abc123def456..." />
+                <div class="hint">
+                    在 Gist 網址中取得：<code>https://gist.github.com/username/<strong>abc123def456</strong></code>
+                </div>
+            </div>
+            <div class="setting-row">
+                <label>Personal Access Token</label>
+                <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+                <div class="hint">
+                    在 <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Tokens</a> 建立，
+                    需勾選 <strong>「gist」</strong> 權限。
+                </div>
+            </div>
+            <div class="settings-actions">
+                <button class="github-btn-sm green" onclick="saveGitHubSettings()">💾 儲存設定</button>
+                <button class="github-btn-sm outline" onclick="testGitHubConnection()">🔌 測試連線</button>
+                <button class="github-btn-sm" onclick="syncToGist()">⬆️ 上傳到 Gist</button>
+                <button class="github-btn-sm outline" onclick="loadFromGist()">⬇️ 從 Gist 下載</button>
+                <button class="github-btn-sm danger" onclick="clearGitHubSettings()">清除設定</button>
+                <button class="toggle-settings-btn" onclick="toggleGitHubSettings()">✕ 關閉</button>
+            </div>
+            <div id="githubMessage" style="margin-top:12px;font-size:13px;color:var(--neutral-gray-400);"></div>
         </div>
     </div>
 
     <!-- ===== 選擇觀察員頁面 ===== -->
     <div id="page-select-observer" class="page-container">
         <div class="privacy-banner">
-            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+            🔒 保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
         </div>
         <div class="select-observer-wrapper">
             <div class="select-observer-title">選擇觀察員</div>
@@ -1188,7 +1581,7 @@
     <!-- ===== Admin 頁面 ===== -->
     <div id="page-admin" class="page-container">
         <div class="privacy-banner">
-            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+            🔒 保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
         </div>
         <div style="margin-bottom: 16px; text-align: right;">
             <button class="back-btn" onclick="goHome()">返回首頁</button>
@@ -1198,7 +1591,7 @@
             <div class="admin-subtitle">觀察員填寫進度總覽</div>
             <div class="admin-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                 <div class="icon">📤</div>
-                <div class="text">拖曳 CSV 檔案 到這裡，或點擊上傳</div>
+                <div class="text">拖曳 CSV 檔案到這裡，或點擊上傳</div>
                 <div class="sub-text">支援從 Google Sheets 下載的 CSV 檔案</div>
                 <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleFileUpload(event)">
             </div>
@@ -1230,11 +1623,24 @@
     <!-- ===== 觀察頁 ===== -->
     <div id="page-observer" class="page-container">
         <div class="privacy-banner">
-            保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
+            🔒 保密聲明：本觀察系統僅供現場研究、服務質素監察部內部數據分析使用。嚴禁記錄任何可識別報案人身份之個人資料，系統只客觀記錄報案人行為動作，不得留存任何私隱資訊。
         </div>
         <div style="margin-bottom: 16px; text-align: right;">
             <button class="ctrl-btn btn-reset" onclick="goHome()" style="background: #64748B; color: #fff;">返回首頁</button>
         </div>
+
+        <!-- ===== GitHub 同步列 ===== -->
+        <div class="github-sync-bar" id="observerGithubBar">
+            <span class="status" id="observerGithubStatus">
+                <span class="github-badge disconnected" id="syncBadge">未連接</span>
+                <span style="margin-left:8px;" id="syncStatusText">本地模式</span>
+            </span>
+            <button class="github-btn-sm" onclick="syncToGist()" title="將所有數據上傳到 GitHub Gist">⬆️ 上傳</button>
+            <button class="github-btn-sm outline" onclick="loadFromGist()" title="從 GitHub Gist 下載數據">⬇️ 下載</button>
+            <button class="toggle-settings-btn" onclick="toggleGitHubSettings()">⚙️ 設定</button>
+            <span style="font-size:12px;color:var(--neutral-gray-400);" id="syncTimeDisplay">--</span>
+        </div>
+
         <div class="global-info-panel">
             <h3>觀察基礎資訊 <span class="tip-text">（帶*為必填）</span></h3>
             <div class="global-row">
@@ -1313,7 +1719,7 @@
                 </table>
             </div>
             <div class="table-btn-group">
-                <button class="upload-btn" onclick="uploadToCloud()">上傳至雲端</button>
+                <!-- 移除 Netlify 上傳按鈕，只保留清空記錄 -->
                 <button class="clear-btn" onclick="clearAllRecordsWithDownload()">清空全部記錄</button>
             </div>
         </div>
@@ -1324,146 +1730,325 @@
     <!-- ============================================================ -->
     <script>
         // ================================================================
-        // Google Sheets 設定
+        // 核心行為記錄功能
         // ================================================================
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzBfqGZX5G5qeuI3_yvpknyAx-6CEmz5js9O8FEygANZhAPS3jkx9HXIDd1xdMK_LOg/exec';
-        const PERSONAL_REPORT_URL = 'https://script.google.com/macros/s/AKfycbwZf8XfVJBL84vTwQQelH9BlZVjyxs-aIyuPmMoNRkJm71-LAqkwYryAnk77XLMJmFmKw/exec';
+        const actionGroups = [
+            { action: '留意到取票機', group: 'group-1' },
+            { action: '留意到自助服務機', group: 'group-1' },
+            { action: '留意到網上服務', group: 'group-1' },
+            { action: '取票機', group: 'group-2' },
+            { action: '櫃枱', group: 'group-2' },
+            { action: '自助服務機', group: 'group-2' },
+            { action: '等候區', group: 'group-2' },
+            { action: '職員諮詢/指示', group: 'group-3' },
+            { action: '櫃枱接待報案', group: 'group-4' },
+            { action: '完成自助服務機報案', group: 'group-5' },
+            { action: '完成網上服務報案', group: 'group-5' }
+        ];
+
+        let globalDivision = "";
+        let globalPeriod = "";
+        let allRecords = [];
+        let currentObs = null;
 
         // ================================================================
-        // 自動同步函數（每次記錄動作時自動觸發）
+        // GitHub Gist 同步模組
         // ================================================================
-        let syncTimeout = null;
-        let syncQueue = [];
+        const GITHUB_CONFIG_KEY = 'github_gist_config';
+        const GITHUB_LAST_SYNC_KEY = 'github_last_sync';
 
-        function autoSyncToSheets(immediate = false) {
-            if (allRecords.length === 0) return;
-            if (immediate) {
-                sendToGoogleSheets(allRecords);
-                return;
+        function getGitHubConfig() {
+            try {
+                const raw = localStorage.getItem(GITHUB_CONFIG_KEY);
+                if (raw) return JSON.parse(raw);
+            } catch (e) {}
+            return null;
+        }
+
+        function saveGitHubConfig(config) {
+            localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(config));
+        }
+
+        function getLastSyncTime() {
+            return localStorage.getItem(GITHUB_LAST_SYNC_KEY) || '--';
+        }
+
+        function setLastSyncTime() {
+            const now = new Date().toLocaleString('zh-HK', { hour12: false });
+            localStorage.setItem(GITHUB_LAST_SYNC_KEY, now);
+            return now;
+        }
+
+        function updateGitHubUI() {
+            const config = getGitHubConfig();
+            const badge = document.getElementById('githubStatusBadge');
+            const syncTime = document.getElementById('githubLastSync');
+            const observerStatus = document.getElementById('observerGithubStatus');
+            const syncBadge = document.getElementById('syncBadge');
+            const syncStatusText = document.getElementById('syncStatusText');
+            const syncTimeDisplay = document.getElementById('syncTimeDisplay');
+
+            const lastSync = getLastSyncTime();
+
+            if (config && config.gistId && config.token) {
+                if (badge) { badge.textContent = '✅ 已連接 Gist';
+                    badge.className = 'github-badge connected'; }
+                if (syncBadge) { syncBadge.textContent = '✅ 已連接';
+                    syncBadge.className = 'github-badge connected'; }
+                if (syncStatusText) syncStatusText.textContent = 'Gist 同步就緒';
+                if (syncTimeDisplay) syncTimeDisplay.textContent = '上次同步：' + lastSync;
+                if (syncTime) syncTime.textContent = '上次同步：' + lastSync;
+                document.querySelectorAll('.github-badge').forEach(el => {
+                    if (el.id !== 'githubStatusBadge' && el.id !== 'syncBadge') {
+                        el.textContent = '✅ 已連接 Gist';
+                        el.className = 'github-badge connected';
+                    }
+                });
+            } else {
+                if (badge) { badge.textContent = '🔌 未連接';
+                    badge.className = 'github-badge disconnected'; }
+                if (syncBadge) { syncBadge.textContent = '🔌 未連接';
+                    syncBadge.className = 'github-badge disconnected'; }
+                if (syncStatusText) syncStatusText.textContent = '本地模式（未設定 Gist）';
+                if (syncTimeDisplay) syncTimeDisplay.textContent = '--';
+                if (syncTime) syncTime.textContent = '上次同步：--';
+                document.querySelectorAll('.github-badge').forEach(el => {
+                    if (el.id !== 'githubStatusBadge' && el.id !== 'syncBadge') {
+                        el.textContent = '🔌 未連接';
+                        el.className = 'github-badge disconnected';
+                    }
+                });
             }
-            syncQueue = allRecords.slice();
-            if (syncTimeout) clearTimeout(syncTimeout);
-            syncTimeout = setTimeout(() => {
-                if (syncQueue.length > 0) {
-                    sendToGoogleSheets(syncQueue);
-                    syncQueue = [];
+        }
+
+        function toggleGitHubSettings() {
+            const panel = document.getElementById('githubSettingsPanel');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
+                const config = getGitHubConfig();
+                if (config) {
+                    document.getElementById('gistIdInput').value = config.gistId || '';
+                    document.getElementById('githubTokenInput').value = config.token || '';
                 }
-                syncTimeout = null;
-            }, 2000);
+                document.getElementById('githubMessage').textContent = '';
+            }
         }
 
-        function sendToGoogleSheets(records) {
-            const observer = document.getElementById('observerName').value || '未填寫';
-            const date = document.getElementById('obsDate').value || '未填寫';
-            const period = globalPeriod || '未選擇';
-            const division = globalDivision || '未選擇';
-            const counts = getCountValues();
-
-            const recordsToSubmit = records.map(rec => ({
-                observer: observer, date: date, period: period, division: division,
-                observerCount: counts.observerCount, staffCount: counts.staffCount,
-                counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
-                gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
-                action: rec.action || '', note: rec.note || '',
-                stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
-                recordTime: rec.recordTime
-            }));
-
-            fetch(GOOGLE_SHEETS_URL, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(recordsToSubmit)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) console.log('同步成功，共 ' + result.count + ' 筆');
-            })
-            .catch(error => console.error('同步錯誤:', error));
+        function saveGitHubSettings() {
+            const gistId = document.getElementById('gistIdInput').value.trim();
+            const token = document.getElementById('githubTokenInput').value.trim();
+            if (!gistId || !token) {
+                document.getElementById('githubMessage').textContent = '⚠️ 請完整填寫 Gist ID 和 Token';
+                document.getElementById('githubMessage').style.color = '#B45309';
+                return;
+            }
+            saveGitHubConfig({ gistId, token });
+            document.getElementById('githubMessage').textContent = '✅ 設定已儲存！';
+            document.getElementById('githubMessage').style.color = '#166534';
+            updateGitHubUI();
+            setTimeout(() => testGitHubConnection(), 300);
         }
 
-        // ================================================================
-        // 上傳至雲端（手動觸發，上傳到主試算表 + 個人報告）
-        // ================================================================
-        function uploadToCloud() {
-            if (allRecords.length === 0) {
-                alert('目前沒有任何記錄可以上傳！');
+        function clearGitHubSettings() {
+            if (!confirm('確定要清除 GitHub 設定嗎？')) return;
+            localStorage.removeItem(GITHUB_CONFIG_KEY);
+            document.getElementById('gistIdInput').value = '';
+            document.getElementById('githubTokenInput').value = '';
+            document.getElementById('githubMessage').textContent = '已清除設定';
+            document.getElementById('githubMessage').style.color = '#991b1b';
+            updateGitHubUI();
+        }
+
+        async function testGitHubConnection() {
+            const config = getGitHubConfig();
+            if (!config || !config.gistId || !config.token) {
+                document.getElementById('githubMessage').textContent = '⚠️ 請先儲存 Gist ID 和 Token';
+                document.getElementById('githubMessage').style.color = '#B45309';
+                return;
+            }
+            document.getElementById('githubMessage').textContent = '⏳ 測試連線中...';
+            document.getElementById('githubMessage').style.color = '#64748B';
+            try {
+                const resp = await fetch(`https://api.github.com/gists/${config.gistId}`, {
+                    headers: {
+                        'Authorization': `token ${config.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (resp.ok) {
+                    document.getElementById('githubMessage').textContent = '✅ 連線成功！Gist 可讀取。';
+                    document.getElementById('githubMessage').style.color = '#166534';
+                } else if (resp.status === 404) {
+                    document.getElementById('githubMessage').textContent = '❌ Gist 不存在，請檢查 Gist ID 是否正確。';
+                    document.getElementById('githubMessage').style.color = '#991b1b';
+                } else if (resp.status === 401) {
+                    document.getElementById('githubMessage').textContent = '❌ Token 無效或權限不足，請檢查 Token 是否包含 gist 權限。';
+                    document.getElementById('githubMessage').style.color = '#991b1b';
+                } else {
+                    document.getElementById('githubMessage').textContent = `❌ 連線失敗 (HTTP ${resp.status})，請檢查設定。`;
+                    document.getElementById('githubMessage').style.color = '#991b1b';
+                }
+            } catch (e) {
+                document.getElementById('githubMessage').textContent = '❌ 網路錯誤：' + e.message;
+                document.getElementById('githubMessage').style.color = '#991b1b';
+            }
+        }
+
+        // ===== 核心 Gist 操作 =====
+        async function syncToGist() {
+            const config = getGitHubConfig();
+            if (!config || !config.gistId || !config.token) {
+                alert('⚠️ 請先在首頁點擊「GitHub 設定」並儲存 Gist ID 和 Token。');
                 return;
             }
 
-            const btn = document.querySelector('.upload-btn');
-            const originalText = btn.textContent;
-            btn.textContent = '上傳中...';
-            btn.disabled = true;
+            const payload = {
+                allRecords: allRecords,
+                currentObs: currentObs,
+                globalDivision: globalDivision,
+                globalPeriod: globalPeriod,
+                version: '1.0',
+                exportedAt: new Date().toISOString()
+            };
+            const jsonData = JSON.stringify(payload, null, 2);
+            const filename = 'report_room_data.json';
 
-            // 1. 上傳到主試算表
-            sendToGoogleSheets(allRecords);
+            const btn = document.querySelector('.github-btn-sm:not(.outline)') || document.querySelector('.github-btn-sm');
+            const originalText = btn ? btn.textContent : '上傳';
+            if (btn) { btn.textContent = '⏳ 上傳中...';
+                btn.disabled = true; }
 
-            // 2. 上傳個人報告
-            const observer = document.getElementById('observerName').value || '未填寫';
-            const date = document.getElementById('obsDate').value || '未填寫';
-            const period = globalPeriod || '未選擇';
-            const division = globalDivision || '未選擇';
-            const counts = getCountValues();
+            try {
+                const getResp = await fetch(`https://api.github.com/gists/${config.gistId}`, {
+                    headers: {
+                        'Authorization': `token ${config.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (!getResp.ok) {
+                    throw new Error(`無法讀取 Gist (HTTP ${getResp.status})`);
+                }
+                const gistData = await getResp.json();
 
-            const endedRecords = allRecords.filter(rec => rec.endTime);
-            if (endedRecords.length > 0) {
-                const recordsToSubmit = endedRecords.map(rec => ({
-                    observer: observer, date: date, period: period, division: division,
-                    observerCount: counts.observerCount, staffCount: counts.staffCount,
-                    counterCount: counts.counterCount, obsIndex: rec.obsIndex || '',
-                    gender: rec.gender || '', age: rec.age || '', ethnicity: rec.ethnicity || '',
-                    action: rec.action || '', note: rec.note || '',
-                    stageDuration: rec.stageDuration, totalDuration: rec.totalDuration,
-                    recordTime: rec.recordTime
-                }));
+                const files = {};
+                for (const [fname, fdata] of Object.entries(gistData.files || {})) {
+                    if (fname === filename) {
+                        files[filename] = { content: jsonData };
+                    } else {
+                        files[fname] = { content: fdata.content || '' };
+                    }
+                }
+                if (!files[filename]) {
+                    files[filename] = { content: jsonData };
+                }
 
-                fetch(PERSONAL_REPORT_URL, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(recordsToSubmit)
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) console.log('個人報告上傳成功，共 ' + result.count + ' 筆');
-                })
-                .catch(error => console.error('個人報告上傳錯誤:', error));
+                const updateResp = await fetch(`https://api.github.com/gists/${config.gistId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `token ${config.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        files: files,
+                        description: '報案室觀察數據 (自動同步)'
+                    })
+                });
+
+                if (!updateResp.ok) {
+                    const errText = await updateResp.text();
+                    throw new Error(`更新 Gist 失敗 (HTTP ${updateResp.status}): ${errText}`);
+                }
+
+                const result = await updateResp.json();
+                const lastSync = setLastSyncTime();
+                updateGitHubUI();
+                document.getElementById('githubMessage').textContent = `✅ 數據已上傳到 Gist！ (${lastSync})`;
+                document.getElementById('githubMessage').style.color = '#166534';
+                alert('✅ 數據已成功上傳到 GitHub Gist！');
+            } catch (e) {
+                console.error('同步到 Gist 失敗:', e);
+                document.getElementById('githubMessage').textContent = '❌ 上傳失敗：' + e.message;
+                document.getElementById('githubMessage').style.color = '#991b1b';
+                alert('❌ 上傳失敗：' + e.message);
+            } finally {
+                if (btn) { btn.textContent = originalText;
+                    btn.disabled = false; }
             }
-
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.disabled = false;
-                alert('數據已成功上傳至雲端！');
-            }, 1500);
         }
 
-        // ================================================================
-        // 清空全部記錄（下載 CSV + Excel，然後清空）
-        // ================================================================
-        function clearAllRecordsWithDownload() {
-            if (allRecords.length === 0) {
-                alert('目前沒有任何記錄可下載或清空！');
+        async function loadFromGist() {
+            const config = getGitHubConfig();
+            if (!config || !config.gistId || !config.token) {
+                alert('⚠️ 請先在首頁點擊「GitHub 設定」並儲存 Gist ID 和 Token。');
                 return;
             }
 
-            if (!confirm('確定要下載並清空所有記錄嗎？\n\n此操作將：\n1. 下載 CSV 檔案\n2. 下載 Excel 報告\n3. 清空所有本地記錄\n\n此操作無法復原！')) {
-                return;
-            }
+            const btn = document.querySelector('.github-btn-sm.outline');
+            const originalText = btn ? btn.textContent : '下載';
+            if (btn) { btn.textContent = '⏳ 下載中...';
+                btn.disabled = true; }
 
-            // 1. 匯出 CSV
-            exportCSV();
+            try {
+                const resp = await fetch(`https://api.github.com/gists/${config.gistId}`, {
+                    headers: {
+                        'Authorization': `token ${config.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (!resp.ok) {
+                    throw new Error(`無法讀取 Gist (HTTP ${resp.status})`);
+                }
+                const gistData = await resp.json();
+                const files = gistData.files || {};
+                const dataFile = files['report_room_data.json'];
+                if (!dataFile) {
+                    throw new Error('Gist 中沒有找到 report_room_data.json 檔案，請先上傳數據。');
+                }
+                const jsonData = JSON.parse(dataFile.content);
 
-            // 2. 匯出 Excel（延遲確保下載完成）
-            setTimeout(() => {
-                exportExcel();
-            }, 500);
+                if (!jsonData.allRecords || !Array.isArray(jsonData.allRecords)) {
+                    throw new Error('數據格式無效：缺少 allRecords 陣列');
+                }
 
-            // 3. 清空所有記錄
-            setTimeout(() => {
-                allRecords = [];
-                currentObs = createBlankObsItem();
+                allRecords = jsonData.allRecords || [];
+                if (jsonData.currentObs) {
+                    currentObs = jsonData.currentObs;
+                }
+                if (jsonData.globalDivision) globalDivision = jsonData.globalDivision;
+                if (jsonData.globalPeriod) globalPeriod = jsonData.globalPeriod;
+
                 saveLocalStorage();
                 renderObservationCard();
                 refreshTable();
-                alert('所有記錄已清空！');
-            }, 1500);
+
+                document.querySelectorAll('#divisionGroup .select-btn').forEach(b => {
+                    b.classList.remove('active');
+                    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${globalDivision}'`)) {
+                        b.classList.add('active');
+                    }
+                });
+                document.querySelectorAll('#periodGroup .select-btn').forEach(b => {
+                    b.classList.remove('active');
+                    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${globalPeriod}'`)) {
+                        b.classList.add('active');
+                    }
+                });
+
+                const lastSync = setLastSyncTime();
+                updateGitHubUI();
+                document.getElementById('githubMessage').textContent = `✅ 從 Gist 載入數據成功！ (${lastSync})，共 ${allRecords.length} 筆記錄。`;
+                document.getElementById('githubMessage').style.color = '#166534';
+                alert(`✅ 從 Gist 載入成功！共 ${allRecords.length} 筆記錄。`);
+            } catch (e) {
+                console.error('從 Gist 載入失敗:', e);
+                document.getElementById('githubMessage').textContent = '❌ 載入失敗：' + e.message;
+                document.getElementById('githubMessage').style.color = '#991b1b';
+                alert('❌ 載入失敗：' + e.message);
+            } finally {
+                if (btn) { btn.textContent = originalText;
+                    btn.disabled = false; }
+            }
         }
 
         // ================================================================
@@ -1472,14 +2057,19 @@
         function showPage(pageId) {
             document.querySelectorAll('.page-container').forEach(el => el.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
+            updateGitHubUI();
         }
+
         function goHome() { showPage('page-home'); }
+
         function goToAdmin() { showPage('page-admin'); }
+
         function goToSelectObserver() {
             showPage('page-select-observer');
             document.querySelectorAll('.observer-option-btn').forEach(btn => btn.classList.remove('selected'));
             document.getElementById('selectedDisplay').textContent = '';
         }
+
         function goToObserver() {
             showPage('page-observer');
             if (!currentObs) {
@@ -1491,6 +2081,7 @@
                 setInterval(updateTimer, 1000);
                 window._timerStarted = true;
             }
+            updateGitHubUI();
         }
 
         function selectObserver(name) {
@@ -1511,7 +2102,7 @@
         }
 
         // ================================================================
-        // Admin 功能
+        // Admin 功能（保留）
         // ================================================================
         let adminData = [];
 
@@ -1594,51 +2185,56 @@
             grid.innerHTML = '';
             const observerNames = Object.keys(observerMap);
             if (observerNames.length === 0) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無數據</div>';
+                grid.innerHTML =
+                    '<div style="grid-column:1/-1;text-align:center;color:var(--neutral-gray-300);padding:20px;">尚無數據</div>';
             }
             observerNames.forEach(name => {
                 const cases = observerMap[name];
                 const card = document.createElement('div');
                 card.className = 'admin-observer-card';
                 card.innerHTML = `
-                    <div class="admin-observer-name">${name}</div>
-                    <div class="admin-observer-stats">
-                        <span><span class="stat-value">${cases.length}</span> <span class="stat-label">總案件</span></span>
-                    </div>
-                `;
+                            <div class="admin-observer-name">${name}</div>
+                            <div class="admin-observer-stats">
+                                <span><span class="stat-value">${cases.length}</span> <span class="stat-label">總案件</span></span>
+                            </div>
+                        `;
                 grid.appendChild(card);
             });
 
             const tbody = document.getElementById('adminDetailBody');
             tbody.innerHTML = '';
             if (allCases.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
+                tbody.innerHTML =
+                    '<tr><td colspan="7" style="text-align:center;color:var(--neutral-gray-300);">尚無數據</td></tr>';
                 return;
             }
             const displayCases = allCases.slice(0, 100);
             displayCases.forEach(record => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${record.觀察者 || '-'}</td>
-                    <td>${record.報案人編號 || '-'}</td>
-                    <td>${record.觀察日期 || '-'}</td>
-                    <td>${record.觀察時段 || '-'}</td>
-                    <td>${record.報案室 || '-'}</td>
-                    <td><span class="status-tag ended">已提交</span></td>
-                    <td>${record.行為動作 ? 1 : 0}</td>
-                `;
+                            <td>${record.觀察者 || '-'}</td>
+                            <td>${record.報案人編號 || '-'}</td>
+                            <td>${record.觀察日期 || '-'}</td>
+                            <td>${record.觀察時段 || '-'}</td>
+                            <td>${record.報案室 || '-'}</td>
+                            <td><span class="status-tag ended">已提交</span></td>
+                            <td>${record.行為動作 ? 1 : 0}</td>
+                        `;
                 tbody.appendChild(tr);
             });
             if (allCases.length > 100) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="7" style="text-align:center;color:var(--neutral-gray-400);">顯示最近 100 筆，共 ${allCases.length} 筆</td>`;
+                tr.innerHTML =
+                    `<td colspan="7" style="text-align:center;color:var(--neutral-gray-400);">顯示最近 100 筆，共 ${allCases.length} 筆</td>`;
                 tbody.appendChild(tr);
             }
         }
 
         function exportAdminCSV() {
             if (adminData.length === 0) { alert('沒有數據可匯出！'); return; }
-            const headers = ['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
+            const headers = ['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)',
+                '總時長(秒)', '記錄時間'
+            ];
             let csvContent = "\uFEFF" + headers.join(",") + "\n";
             adminData.forEach(rec => {
                 const row = [
@@ -1664,7 +2260,9 @@
         function exportAdminExcel() {
             if (adminData.length === 0) { alert('沒有數據可匯出！'); return; }
             const data = [];
-            data.push(['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間']);
+            data.push(['觀察者', '報案人編號', '觀察日期', '觀察時段', '報案室', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)',
+                '總時長(秒)', '記錄時間'
+            ]);
             adminData.forEach(rec => {
                 data.push([
                     rec.觀察者 || '', rec.報案人編號 || '', rec.觀察日期 || '',
@@ -1730,27 +2328,8 @@
         });
 
         // ================================================================
-        // 核心行為記錄功能
+        // 核心觀察功能
         // ================================================================
-        const actionGroups = [
-            { action: '留意到取票機', group: 'group-1' },
-            { action: '留意到自助服務機', group: 'group-1' },
-            { action: '留意到網上服務', group: 'group-1' },
-            { action: '取票機', group: 'group-2' },
-            { action: '櫃枱', group: 'group-2' },
-            { action: '自助服務機', group: 'group-2' },
-            { action: '等候區', group: 'group-2' },
-            { action: '職員諮詢/指示', group: 'group-3' },
-            { action: '櫃枱接待報案', group: 'group-4' },
-            { action: '完成自助服務機報案', group: 'group-5' },
-            { action: '完成網上服務報案', group: 'group-5' }
-        ];
-
-        let globalDivision = "";
-        let globalPeriod = "";
-        let allRecords = [];
-        let currentObs = null;
-
         function autoDetectDivision() {
             if (!navigator.geolocation) return;
             const divisions = [
@@ -1759,14 +2338,15 @@
                 { name: 'YLDIV RR', label: 'YLDIV', lat: 22.4428, lng: 114.0230 },
                 { name: 'TPDIV RR', label: 'TPDIV', lat: 22.4506, lng: 114.1640 }
             ];
+
             function getDistance(lat1, lon1, lat2, lon2) {
                 const R = 6371;
                 const dLat = (lat2 - lat1) * Math.PI / 180;
                 const dLon = (lon2 - lon1) * Math.PI / 180;
-                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                          Math.sin(dLon/2) * Math.sin(dLon/2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                 return R * c;
             }
             navigator.geolocation.getCurrentPosition(
@@ -1864,6 +2444,7 @@
             updateRealTimeClock();
             setTimeout(autoSelectPeriod, 300);
             setTimeout(autoDetectDivision, 800);
+            updateGitHubUI();
             showPage('page-home');
         });
 
@@ -1905,11 +2486,11 @@
             let pendingBannerHtml = "";
             if (hasPending) {
                 pendingBannerHtml = `
-                    <div class="pending-banner">
-                        <span>目前有候補時間點尚未命名（提示：您可直接在下方「數據匯總表」內打字修改）</span>
-                        <button class="ctrl-btn btn-start" style="padding: 4px 12px; font-size: 12px; background: var(--orange-warning);" onclick="fillPendingName()">彈窗補齊</button>
-                    </div>
-                `;
+                            <div class="pending-banner">
+                                <span>目前有候補時間點尚未命名（提示：您可直接在下方「數據匯總表」內打字修改）</span>
+                                <button class="ctrl-btn btn-start" style="padding: 4px 12px; font-size: 12px; background: var(--orange-warning);" onclick="fillPendingName()">彈窗補齊</button>
+                            </div>
+                        `;
             }
 
             let actionsHtml = actionGroups.map(item => {
@@ -1917,111 +2498,103 @@
                 const group = item.group;
                 if (act === '櫃枱接待報案') {
                     const numberBtns = [1, 2, 3, 4, 5].map(num => `
-                        <button class="counter-btn" ${!obs.isRunning ? 'disabled' : ''}
-                                onclick="recordAction('${num}號櫃枱接待報案')"
-                                title="記錄 ${num} 號櫃枱接待報案">${num}</button>
-                    `).join('');
+                                <button class="counter-btn" ${!obs.isRunning ? 'disabled' : ''}
+                                        onclick="recordAction('${num}號櫃枱接待報案')"
+                                        title="記錄 ${num} 號櫃枱接待報案">${num}</button>
+                            `).join('');
                     return `
-                        <div class="action-pair ${group}" style="flex-wrap: nowrap;">
-                            <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
-                            <div class="counter-btn-group">${numberBtns}</div>
-                            <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
-                        </div>
-                    `;
+                                <div class="action-pair ${group}" style="flex-wrap: nowrap;">
+                                    <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
+                                    <div class="counter-btn-group">${numberBtns}</div>
+                                    <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
+                                </div>
+                            `;
                 }
                 return `
-                    <div class="action-pair ${group}">
-                        <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
-                        <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
-                    </div>
-                `;
+                            <div class="action-pair ${group}">
+                                <button class="action-btn-main" ${!obs.isRunning ? 'disabled' : ''} onclick="recordAction('${act}')">${act}</button>
+                                <button class="action-btn-note" ${!obs.isRunning ? 'disabled' : ''} title="點擊記錄此動作並添加備註" onclick="recordActionWithNote('${act}')">備註</button>
+                            </div>
+                        `;
             }).join('');
 
             container.innerHTML = `
-                <div class="${cardClass}" data-id="${obs.id}">
-                    <div class="col-header">
-                        <div class="col-title-wrap">
-                            <span class="col-label">報案人編號：</span>
-                            <input class="case-id-input-small" value="${obs.caseIndex}" onchange="changeCaseId(this)" placeholder="編號">
-                            <span class="col-status">${statusText}</span>
-                        </div>
-                    </div>
-                    <div class="stopwatch-container">
-                        <div class="col-stopwatch">${mins}:${secs}</div>
-                        <div class="col-control-btns">
-                            <button class="ctrl-btn btn-start" ${obs.isRunning ? 'disabled' : ''} onclick="startTimer()">進入報案室 (開始觀察)</button>
-                            <button class="ctrl-btn btn-reset" onclick="resetTimer()">取消記錄</button>
-                        </div>
-                    </div>
-                    <div class="col-timeline-section">
-                        <div class="timeline-info-row">
-                            <span>當前已持續時間：<strong>${mins}:${secs}</strong></span>
-                            <span id="realTimeClock">當前時間：--:--:--</span>
-                            <span>已記錄事件數：<strong id="timeline-count">${obs.timelineEvents.length}</strong></span>
-                        </div>
-                        <div class="timeline-wrap" data-timeline-wrap>
-                            <div class="timeline-track" data-timeline-track></div>
-                            <div class="timeline-now-line" data-timeline-now></div>
-                        </div>
-                        <div class="timeline-note">首個動作為自動起點，其後標示兩動作之間歷時，紅線為當前時間點。</div>
-                    </div>
-                    <h4>行為動作記錄</h4>
-                    <div class="actions-container">
-                        <button class="quick-btn" ${!obs.isRunning ? 'disabled' : ''} onclick="quickMark()">快速記錄當下時間 (後補動作)</button>
-                        ${pendingBannerHtml}
-                        ${actionsHtml}
-                        <div class="custom-action-row">
-                            <input class="custom-action-input" placeholder="輸入其他自訂動作，按 Enter 記錄"
-                                   onkeydown="if(event.key==='Enter')recordCustomAction(this, false)"
-                                   ${!obs.isRunning ? 'disabled' : ''}>
-                            <button class="ctrl-btn btn-reset" style="background:#475569; white-space:nowrap; padding: 0 16px; font-size:13px;"
-                                    ${!obs.isRunning ? 'disabled' : ''}
-                                    onclick="recordCustomAction(document.querySelector('.custom-action-input'), true)">加備註記錄</button>
-                        </div>
-                    </div>
-                    <div class="detail-section">
-                        <h4>報案人表觀特徵</h4>
-                        <div class="trait-grid">
-                            <div class="trait-group">
-                                <strong>性別</strong>
-                                <div class="btn-group">
-                                    <button class="select-btn ${obs.gender==='男'?'active':''}" onclick="setObsTrait('gender', '男', this)">男</button>
-                                    <button class="select-btn ${obs.gender==='女'?'active':''}" onclick="setObsTrait('gender', '女', this)">女</button>
-                                    <button class="select-btn ${obs.gender==='多人'?'active':''}" onclick="setObsTrait('gender', '多人', this)">多人</button>
+                        <div class="${cardClass}" data-id="${obs.id}">
+                            <div class="col-header">
+                                <div class="col-title-wrap">
+                                    <span class="col-label">報案人編號：</span>
+                                    <input class="case-id-input-small" value="${obs.caseIndex}" onchange="changeCaseId(this)" placeholder="編號">
+                                    <span class="col-status">${statusText}</span>
                                 </div>
                             </div>
-                            <div class="trait-group">
-                                <strong>年齡層</strong>
-                                <div class="btn-group">
-                                    <button class="select-btn ${obs.age==='30歲以下'?'active':''}" onclick="setObsTrait('age', '30歲以下', this)">30歲以下</button>
-                                    <button class="select-btn ${obs.age==='31-59歲'?'active':''}" onclick="setObsTrait('age', '31-59歲', this)">31-59歲</button>
-                                    <button class="select-btn ${obs.age==='60歲以上'?'active':''}" onclick="setObsTrait('age', '60歲以上', this)">60歲以上</button>
+                            <div class="stopwatch-container">
+                                <div class="col-stopwatch">${mins}:${secs}</div>
+                                <div class="col-control-btns">
+                                    <button class="ctrl-btn btn-start" ${obs.isRunning ? 'disabled' : ''} onclick="startTimer()">進入報案室 (開始觀察)</button>
+                                    <button class="ctrl-btn btn-reset" onclick="resetTimer()">取消記錄</button>
                                 </div>
                             </div>
-                            <div class="trait-group">
-                                <strong>族裔</strong>
-                                <div class="btn-group">
-                                    <button class="select-btn ${obs.ethnicity==='華裔'?'active':''}" onclick="setObsTrait('ethnicity', '華裔', this)">華裔</button>
-                                    <button class="select-btn ${obs.ethnicity==='非華裔'?'active':''}" onclick="setObsTrait('ethnicity', '非華裔', this)">非華裔</button>
+                            <div class="col-timeline-section">
+                                <div class="timeline-info-row">
+                                    <span>當前已持續時間：<strong>${mins}:${secs}</strong></span>
+                                    <span id="realTimeClock">當前時間：--:--:--</span>
+                                    <span>已記錄事件數：<strong id="timeline-count">${obs.timelineEvents.length}</strong></span>
                                 </div>
+                                <div class="timeline-wrap" data-timeline-wrap>
+                                    <div class="timeline-track" data-timeline-track></div>
+                                    <div class="timeline-now-line" data-timeline-now></div>
+                                </div>
+                                <div class="timeline-note">首個動作為自動起點，其後標示兩動作之間歷時，紅線為當前時間點。</div>
+                            </div>
+                            <h4>行為動作記錄</h4>
+                            <div class="actions-container">
+                                <button class="quick-btn" ${!obs.isRunning ? 'disabled' : ''} onclick="quickMark()">快速記錄當下時間 (後補動作)</button>
+                                ${pendingBannerHtml}
+                                ${actionsHtml}
+                                <div class="custom-action-row">
+                                    <input class="custom-action-input" placeholder="輸入其他自訂動作，按 Enter 記錄"
+                                           onkeydown="if(event.key==='Enter')recordCustomAction(this, false)"
+                                           ${!obs.isRunning ? 'disabled' : ''}>
+                                    <button class="ctrl-btn btn-reset" style="background:#475569; white-space:nowrap; padding: 0 16px; font-size:13px;"
+                                            ${!obs.isRunning ? 'disabled' : ''}
+                                            onclick="recordCustomAction(document.querySelector('.custom-action-input'), true)">加備註記錄</button>
+                                </div>
+                            </div>
+                            <div class="detail-section">
+                                <h4>報案人表觀特徵</h4>
+                                <div class="trait-grid">
+                                    <div class="trait-group">
+                                        <strong>性別</strong>
+                                        <div class="btn-group">
+                                            <button class="select-btn ${obs.gender==='男'?'active':''}" onclick="setObsTrait('gender', '男', this)">男</button>
+                                            <button class="select-btn ${obs.gender==='女'?'active':''}" onclick="setObsTrait('gender', '女', this)">女</button>
+                                            <button class="select-btn ${obs.gender==='多人'?'active':''}" onclick="setObsTrait('gender', '多人', this)">多人</button>
+                                        </div>
+                                    </div>
+                                    <div class="trait-group">
+                                        <strong>年齡層</strong>
+                                        <div class="btn-group">
+                                            <button class="select-btn ${obs.age==='30歲以下'?'active':''}" onclick="setObsTrait('age', '30歲以下', this)">30歲以下</button>
+                                            <button class="select-btn ${obs.age==='31-59歲'?'active':''}" onclick="setObsTrait('age', '31-59歲', this)">31-59歲</button>
+                                            <button class="select-btn ${obs.age==='60歲以上'?'active':''}" onclick="setObsTrait('age', '60歲以上', this)">60歲以上</button>
+                                        </div>
+                                    </div>
+                                    <div class="trait-group">
+                                        <strong>族裔</strong>
+                                        <div class="btn-group">
+                                            <button class="select-btn ${obs.ethnicity==='華裔'?'active':''}" onclick="setObsTrait('ethnicity', '華裔', this)">華裔</button>
+                                            <button class="select-btn ${obs.ethnicity==='非華裔'?'active':''}" onclick="setObsTrait('ethnicity', '非華裔', this)">非華裔</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="submit-section">
+                                <button class="btn-submit" style="background-color: var(--neutral-gray-400);" onclick="submitCurrentObservation()">結束觀察</button>
                             </div>
                         </div>
-                    </div>
-                    <div class="submit-section">
-                        <button class="btn-submit" style="background-color: var(--neutral-gray-400);" onclick="submitCurrentObservation()">結束觀察</button>
-                    </div>
-                </div>
-            `;
+                    `;
             renderTimelineData();
             updateRealTimeClock();
-        }
-
-        function updateRealTimeClock() {
-            const clock = document.getElementById('realTimeClock');
-            if (clock) {
-                const now = new Date();
-                clock.textContent = `當前時間：${now.toLocaleTimeString('zh-HK', { hour12: false })}`;
-            }
         }
 
         function renderTimelineData() {
@@ -2067,6 +2640,14 @@
                 }
             }
             updateRealTimeClock();
+        }
+
+        function updateRealTimeClock() {
+            const clock = document.getElementById('realTimeClock');
+            if (clock) {
+                const now = new Date();
+                clock.textContent = `當前時間：${now.toLocaleTimeString('zh-HK', { hour12: false })}`;
+            }
         }
 
         function startTimer() {
@@ -2150,8 +2731,6 @@
             renderObservationCard();
             syncCurrentObsToAllRecords();
             refreshTable();
-            // 自動同步到主試算表
-            autoSyncToSheets(false);
         }
 
         function recordAction(actName) {
@@ -2355,16 +2934,16 @@
             mask.className = 'modal-mask';
             mask.id = 'dynamicModal';
             mask.innerHTML = `
-                <div class="modal-box">
-                    <div class="modal-title">${title}</div>
-                    <textarea class="modal-textarea" placeholder="${placeholder}"></textarea>
-                    <div class="modal-buttons">
-                        <button class="modal-btn modal-cancel" id="mCancel">取消</button>
-                        ${showSkip ? `<button class="modal-btn modal-skip" id="mSkip">略過備註</button>` : ''}
-                        <button class="modal-btn modal-save" id="mSave">確認儲存</button>
-                    </div>
-                </div>
-            `;
+                        <div class="modal-box">
+                            <div class="modal-title">${title}</div>
+                            <textarea class="modal-textarea" placeholder="${placeholder}"></textarea>
+                            <div class="modal-buttons">
+                                <button class="modal-btn modal-cancel" id="mCancel">取消</button>
+                                ${showSkip ? `<button class="modal-btn modal-skip" id="mSkip">略過備註</button>` : ''}
+                                <button class="modal-btn modal-save" id="mSave">確認儲存</button>
+                            </div>
+                        </div>
+                    `;
             document.body.appendChild(mask);
             const txt = mask.querySelector('.modal-textarea');
             txt.focus();
@@ -2395,18 +2974,24 @@
         }
 
         function loadLocalStorage() {
-            if (localStorage.getItem('observerName')) document.getElementById('observerName').value = localStorage.getItem('observerName');
+            if (localStorage.getItem('observerName')) document.getElementById('observerName').value = localStorage.getItem(
+                'observerName');
             if (localStorage.getItem('obsDate')) document.getElementById('obsDate').value = localStorage.getItem('obsDate');
-            if (localStorage.getItem('observerCount')) document.getElementById('observerCount').value = localStorage.getItem('observerCount');
-            if (localStorage.getItem('staffCount')) document.getElementById('staffCount').value = localStorage.getItem('staffCount');
-            if (localStorage.getItem('counterCount')) document.getElementById('counterCount').value = localStorage.getItem('counterCount');
+            if (localStorage.getItem('observerCount')) document.getElementById('observerCount').value = localStorage.getItem(
+                'observerCount');
+            if (localStorage.getItem('staffCount')) document.getElementById('staffCount').value = localStorage.getItem(
+                'staffCount');
+            if (localStorage.getItem('counterCount')) document.getElementById('counterCount').value = localStorage.getItem(
+                'counterCount');
             globalDivision = localStorage.getItem('globalDivision') || "";
             globalPeriod = localStorage.getItem('globalPeriod') || "";
             document.querySelectorAll('#divisionGroup .select-btn').forEach(b => {
-                if (b.getAttribute('onclick').includes(`'${globalDivision}'`)) b.classList.add('active');
+                if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${globalDivision}'`)) b.classList.add(
+                    'active');
             });
             document.querySelectorAll('#periodGroup .select-btn').forEach(b => {
-                if (b.getAttribute('onclick').includes(`'${globalPeriod}'`)) b.classList.add('active');
+                if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${globalPeriod}'`)) b.classList.add(
+                    'active');
             });
             allRecords = JSON.parse(localStorage.getItem('allRecords')) || [];
             if (localStorage.getItem('currentObs')) {
@@ -2419,7 +3004,9 @@
                 alert('當前數據庫中沒有任何資料可供匯出！');
                 return;
             }
-            const headers = ['報案人編號', '觀察者', '觀察日期', '觀察時段', '報案室', '觀察員數目', '職員數目', '開放櫃枱數目', '開始時間', '結束時間', '性別', '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'];
+            const headers = ['報案人編號', '觀察者', '觀察日期', '觀察時段', '報案室', '觀察員數目', '職員數目', '開放櫃枱數目', '開始時間', '結束時間', '性別',
+                '年齡層', '族裔', '行為動作', '動作備註', '階段歷時(秒)', '總時長(秒)', '記錄時間'
+            ];
             let csvContent = "\uFEFF" + headers.join(",") + "\n";
             allRecords.forEach(rec => {
                 const row = [
@@ -2469,9 +3056,13 @@
                 data.push(['觀察者姓名：', first.observer || '']);
                 data.push(['日期：', first.date || '', '時段：', first.period || '', '報案室：', first.division || '']);
                 data.push(['觀察開始時間：', first.startTime || '', '觀察完成時間：', first.endTime || '']);
-                data.push(['觀察員數目：', first.observerCount || '', '職員數目：', first.staffCount || '', '開放櫃枱數目：', first.counterCount || '']);
+                data.push(['觀察員數目：', first.observerCount || '', '職員數目：', first.staffCount || '', '開放櫃枱數目：', first
+                    .counterCount || ''
+                ]);
                 data.push([]);
-                data.push(['報案人編號：', obsIndex, '性別：', first.gender || '', '年齡：', first.age || '', '族裔：', first.ethnicity || '']);
+                data.push(['報案人編號：', obsIndex, '性別：', first.gender || '', '年齡：', first.age || '', '族裔：', first
+                    .ethnicity || ''
+                ]);
                 data.push([]);
                 data.push(['日期', '記錄時間', '行為動作', '階段歷時(秒)', '總時長(秒)', '備註']);
                 records.forEach(rec => {
@@ -2500,6 +3091,31 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
+        }
+
+        // ================================================================
+        // 清空全部記錄（下載 CSV + Excel，然後清空）
+        // ================================================================
+        function clearAllRecordsWithDownload() {
+            if (allRecords.length === 0) {
+                alert('目前沒有任何記錄可下載或清空！');
+                return;
+            }
+
+            if (!confirm('確定要下載並清空所有記錄嗎？\n\n此操作將：\n1. 下載 CSV 檔案\n2. 下載 Excel 報告\n3. 清空所有本地記錄\n\n此操作無法復原！')) {
+                return;
+            }
+
+            exportCSV();
+            setTimeout(() => { exportExcel(); }, 500);
+            setTimeout(() => {
+                allRecords = [];
+                currentObs = createBlankObsItem();
+                saveLocalStorage();
+                renderObservationCard();
+                refreshTable();
+                alert('所有記錄已清空！');
+            }, 1500);
         }
     </script>
 </body>
